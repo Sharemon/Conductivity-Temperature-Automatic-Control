@@ -14,7 +14,7 @@ namespace ConductTempControl_ForPC
         /// <summary>
         /// List all parameters.
         /// </summary>
-        public enum ParameterNames_t
+        public enum Parameters_t
         {
             TempSet = 0,
             TempCorrect,

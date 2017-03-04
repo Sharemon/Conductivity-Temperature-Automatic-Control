@@ -26,14 +26,26 @@ namespace ConductTempControl_ForPC
             // 
             //GlobalVars.InitGlobalVars();
             uart = new UartProtocol("COM1");
+            char a = 'a';
+            this.Text = a.ToString();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            uart.SendCommand(UartProtocol.CommandNames_t.TempSet, 0.01f);
+            UartProtocol.Errors_t error = uart.SendData(UartProtocol.Commands_t.TempSet, 0.01f);
+            if ( error != UartProtocol.Errors_t.NoError)
+            {
+                string err = Enum.GetName(typeof(UartProtocol.Errors_t), error);
+                Exception ex = new Exception(err);
+                throw ex;
+            }
+            System.Threading.Thread.Sleep(1000);
+            float value = -1;
+            uart.ReadData(UartProtocol.Commands_t.PowerShow, out value);
+            this.Text = value.ToString();
         }
 
-        private void test(GlobalVars.ParameterNames_t arg1)
+        private void test(GlobalVars.Parameters_t arg1)
         {
 
         }

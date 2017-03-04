@@ -1,10 +1,9 @@
-﻿//Undone: 1. IsError
-//Undone: 2. Read data
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO.Ports;
+using System.Threading;
 
 namespace ConductTempControl_ForPC
 {
@@ -35,13 +34,25 @@ namespace ConductTempControl_ForPC
             ReadTimeout = readTimeout
         };
 
+        private const int intervalOfWR = 200;
         #endregion
 
         #region Command 
+        public enum Errors_t
+        {
+            NoError = 0,
+            NotInRange,
+            UnknownCmd,
+            IncompleteCmd,
+            BCCError
+        };
+        private readonly string[] errorWords = { "A", "B", "C", "D"};
+        private const char errorFlag = 'E';
+
         /// <summary>
         /// List all commands
         /// </summary>
-        public enum CommandNames_t
+        public enum Commands_t
         {
             TempSet = 0,
             TempCorrect,
@@ -54,13 +65,14 @@ namespace ConductTempControl_ForPC
             PowerShow
         };
         
-        private const string commandHead   = "@35W";
-        private string[] commandWords      = { "A", "B", "C", "D", "E", "F", "G", "H", "I"};
-        private string[] commandFormats    = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0" };
-        private const string commandFinish = ":";
-        private const string commandEnd    = "\r"; // Todo: The endflag may be \r\n, check it.
+        private const string commandHead_W          = "@35W";
+        private const string commandHead_R          = "@35R";
+        private readonly string[] commandWords      = { "A", "B", "C", "D", "E", "F", "G", "H", "I"};
+        private readonly string[] commandFormats    = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0" };
+        private const string commandFinish          = ":";
+        private const string commandEnd             = "\r"; // Todo: The endflag may be \r\n, check it.
 
-        private string[] commandRW         = { "w", "w", "w", "w", "w", "w", "w", "r", "r" };
+        private readonly string[] commandRW         = { "w", "w", "w", "w", "w", "w", "w", "r", "r" };
         #endregion
 
         #endregion
@@ -94,7 +106,7 @@ namespace ConductTempControl_ForPC
         /// </summary>
         /// <param name="commandName">Name of ommand</param>
         /// <param name="value">Value of Command</param>
-        public bool SendCommand(CommandNames_t commandName, float value)
+        public Errors_t SendData(Commands_t commandName, float value)
         {
             // Todo: Check if can remove this and commandRW when development finishes.
             // If the command cannot be write, throw an exception
@@ -105,12 +117,12 @@ namespace ConductTempControl_ForPC
                 throw e;
             }
 
-            string command = ConstructCommand(commandName, value);
+            string command = ConstructCommand(commandName, value, true);
 
             #region Serial Port Open Section
             this.sp.Open();
             this.sp.Write(command);
-            bool error = IsError();
+            Errors_t error = IsError(this.ReadSP());
             this.sp.Close();
             #endregion
 
@@ -120,10 +132,33 @@ namespace ConductTempControl_ForPC
         /// <summary>
         /// Read data from MCU
         /// </summary>
-        /// <param name="commandName"></param>
-        public float ReadData(string commandName)
+        /// <param name="commandName">Name of command</param>
+        /// <param name="readValue">Data read from MCU</param>
+        /// <returns></returns>
+        public Errors_t ReadData(Commands_t commandName, out float readValue)
         {
-            return 0.0f;
+            // All command can be read
+            string command = ConstructCommand(commandName, 0.0f, false);
+
+            #region Serial Port Open Section
+            this.sp.Open();
+            this.sp.Write(command);
+
+            string commandBack= this.ReadSP();
+            this.sp.Close();
+            #endregion
+
+            Errors_t error = IsError(commandBack);
+            if (error != Errors_t.NoError)
+            {
+                readValue = 0.0f;
+            }
+            else
+            {
+                readValue = float.Parse(commandBack.Substring(5));
+            }
+
+            return error;
         }
 
         #endregion
@@ -133,9 +168,32 @@ namespace ConductTempControl_ForPC
         /// Determine i there is any error in communication
         /// </summary>
         /// <returns>Is Error?</returns>
-        private bool IsError()
+        private Errors_t IsError(string command)
         {
-            return false;
+            Errors_t error = Errors_t.NoError;
+
+            if (command[3] == errorFlag)
+            {
+                error = (Errors_t)(Array.IndexOf(errorWords, command[4].ToString()) + 1);
+            }
+
+            return error;
+        }
+
+        /// <summary>
+        /// Read from serial port
+        /// </summary>
+        /// <returns>Command before ":"(finish flag of command)</returns>
+        private string ReadSP()
+        {
+            //Improved: Consoder if it's necessary to use sub thread to read serial port data
+            // ...
+            Thread.Sleep(intervalOfWR);
+            //Improved: Add exception handler for read timeout
+            string readString = this.sp.ReadTo(commandFinish);
+            //Improved: Add BCC checker
+            sp.DiscardInBuffer();
+            return readString;
         }
 
         /// <summary>
@@ -143,16 +201,29 @@ namespace ConductTempControl_ForPC
         /// </summary>
         /// <param name="commandName">Name of command</param>
         /// <param name="value">Value of command</param>
+        /// <param name="W_R">True for write, false for read</param>
         /// <returns></returns>
-        private string ConstructCommand(CommandNames_t commandName, float value)
+        private string ConstructCommand(Commands_t commandName, float value, bool W_R)
         {
             string command = "";
 
-            command += commandHead;
-            command += commandWords[(int)commandName];
-            command += value.ToString(commandFormats[(int)commandName]);
-            command += BCCCal(command, false);
-            command += commandEnd;
+            if (W_R)
+            {
+                command += commandHead_W;
+                command += commandWords[(int)commandName];
+                command += value.ToString(commandFormats[(int)commandName]);
+                command += commandFinish;
+                command += BCCCal(command, false);
+                command += commandEnd;
+            }
+            else
+            {
+                command += commandHead_R;
+                command += commandWords[(int)commandName];
+                command += commandFinish;
+                command += BCCCal(command, false);
+                command += commandEnd;
+            }
 
             return command;
         }
@@ -163,11 +234,11 @@ namespace ConductTempControl_ForPC
         /// <param name="command">Command</param>
         /// <param name="cal">If true, calculate and return BCC. Otherwise, return ""</param>
         /// <returns></returns>
-        private string BCCCal(string command, bool cal)
+        private string BCCCal(string command, bool ifCal)
         {
             string BCC = "";
 
-            if(cal)
+            if(ifCal)
             {
                 // Do not implement as it isn't used in current project
                 // ...
@@ -178,6 +249,17 @@ namespace ConductTempControl_ForPC
             }
 
             return BCC;
+        }
+
+        /// <summary>
+        /// Check if BCC is correct
+        /// </summary>
+        /// <param name="command">Command returned by MCU</param>
+        /// <param name="ifCheck">If true, check and return result. Otherwise, return true.</param>
+        /// <returns></returns>
+        private bool CheckBCC(string command, bool ifCheck)
+        {
+            return true;
         }
         #endregion
     }
