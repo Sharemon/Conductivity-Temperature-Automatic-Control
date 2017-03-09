@@ -84,7 +84,7 @@ namespace ConductTempControl_ForPC
         /// <param name="portName"></param>
         public UartProtocol(string portName)
         {
-            SetPortName(portName);          
+            SetPort(portName);          
         }
         #endregion
 
@@ -94,7 +94,7 @@ namespace ConductTempControl_ForPC
         /// Set port name of serial port in this class and global variables.
         /// </summary>
         /// <param name="portName">Port name of serial port</param>
-        public void SetPortName(string portName)
+        public void SetPort(string portName)
         {
             this.sp.PortName = portName;
             // Keep the GlobalVars.portName is always the latest.
@@ -186,12 +186,12 @@ namespace ConductTempControl_ForPC
         /// <returns>Command before ":"(finish flag of command)</returns>
         private string ReadSP()
         {
-            //Improved: Consoder if it's necessary to use sub thread to read serial port data
+            //Improve: Consoder if it's necessary to use sub thread to read serial port data
             // ...
             Thread.Sleep(intervalOfWR);
-            //Improved: Add exception handler for read timeout
+            //Improve: Add exception handler for read timeout
             string readString = this.sp.ReadTo(commandFinish);
-            //Improved: Add BCC checker
+            //Improve: Add BCC checker
             sp.DiscardInBuffer();
             return readString;
         }

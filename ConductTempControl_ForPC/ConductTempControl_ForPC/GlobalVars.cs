@@ -23,7 +23,7 @@ namespace ConductTempControl_ForPC
             Ratio,
             Integral,
             Power,
-            Fluctation
+            Fluctuation
         };
         #endregion
 
@@ -43,6 +43,35 @@ namespace ConductTempControl_ForPC
         static GlobalVars()
         {
             ;
+        }
+        #endregion
+
+        #region Members
+        /// <summary>
+        /// Get the max value and min value of temperature list
+        /// </summary>
+        /// <param name="count">Counts to calculate</param>
+        /// <param name="tempMax">Max of temperature</param>
+        /// <param name="tempMin">Min of temperature</param>
+        /// <returns>If the max and min can be trusted</returns>
+        public static bool GetMaxMin(int count, out float tempMax, out float tempMin, out float fluctuation)
+        {
+            if(GlobalVars.temperatures.Count == 0 || GlobalVars.temperatures.Count < count)
+            {
+                // If there is not temperature data in list, output extreme max and min value
+                tempMax = 1000;
+                tempMin = -1000;
+                fluctuation = 2000;
+
+                return false;
+            }
+            else
+            {
+                tempMax = GlobalVars.temperatures.GetRange(temperatures.Count - count, count).Max();
+                tempMin = GlobalVars.temperatures.GetRange(temperatures.Count - count, count).Min();
+                fluctuation = tempMax - tempMin;
+                return true;
+            }
         }
         #endregion
     }
