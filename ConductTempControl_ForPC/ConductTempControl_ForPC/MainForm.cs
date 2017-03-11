@@ -32,17 +32,34 @@ namespace ConductTempControl_ForPC
 
         private void button1_Click(object sender, EventArgs e)
         {
-            UartProtocol.Errors_t error = uart.SendData(UartProtocol.Commands_t.TempSet, 0.01f);
-            if ( error != UartProtocol.Errors_t.NoError)
+            GlobalVars.ctrlStartTime = DateTime.Now;
+
+            Timer t1 = new Timer();
+            t1.Interval = GlobalVars.readTempInterval;
+            t1.Tick += timer1_tick;
+            t1.Enabled = true;
+            //GlobalVars.AddTemperature(0.0f);
+
+            bool formExist = false;
+            foreach(Form fm in Application.OpenForms)
             {
-                string err = Enum.GetName(typeof(UartProtocol.Errors_t), error);
-                Exception ex = new Exception(err);
-                throw ex;
+                if (fm.Name == "TemperatureChart")
+                {
+                    fm.BringToFront();
+                    formExist = true;
+                }
             }
-            System.Threading.Thread.Sleep(1000);
-            float value = -1;
-            uart.ReadData(UartProtocol.Commands_t.PowerShow, out value);
-            this.Text = value.ToString();
+            if (!formExist)
+            {
+                TemperatureChart fm = new TemperatureChart();
+                fm.Show();
+            }
+        }
+
+        private void timer1_tick(object sender, EventArgs e)
+        {
+            Random rn = new Random();
+            GlobalVars.AddTemperature((float)rn.NextDouble());
         }
 
         private void test(GlobalVars.Parameters_t arg1)

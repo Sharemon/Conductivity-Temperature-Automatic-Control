@@ -122,11 +122,9 @@ namespace ConductTempControl_ForPC
             }
 
             float fluctuation = 0;
-            float tempMax = 0;
-            float tempMin = 0;
 
             // If there not enough temperature point to check fluctuation, consider it not in range
-            if ( !GlobalVars.GetMaxMin(count, out tempMax, out tempMin, out fluctuation))
+            if ( !GlobalVars.GetFluc(count, out fluctuation))
             {
                 return false;
             }
