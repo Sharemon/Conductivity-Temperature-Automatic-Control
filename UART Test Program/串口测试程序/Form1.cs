@@ -68,16 +68,16 @@ namespace 串口测试程序
                                                 sp.WriteLine("@35RC9.098:");
                                                 break;
                                             case 'D':
-                                                sp.WriteLine("@35RD9.098:");
+                                                sp.WriteLine("@35RD9:");
                                                 break;
                                             case 'E':
-                                                sp.WriteLine("@35RE9.098:");
+                                                sp.WriteLine("@35RE9:");
                                                 break;
                                             case 'F':
-                                                sp.WriteLine("@35RF9.098:");
+                                                sp.WriteLine("@35RF9:");
                                                 break;
                                             case 'G':
-                                                sp.WriteLine("@35RG9.098:");
+                                                sp.WriteLine("@35RG9:");
                                                 break;
                                             default: MessageBox.Show(str); break;
                                         }
