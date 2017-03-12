@@ -101,6 +101,7 @@
     <Compile Include="AutoControl.Designer.cs">
       <DependentUpon>AutoControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Data2File.cs" />
     <Compile Include="DrawChart.cs" />
     <Compile Include="GlbVars.cs" />
     <Compile Include="LogShow.cs">

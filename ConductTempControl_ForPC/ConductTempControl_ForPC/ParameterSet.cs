@@ -1,6 +1,4 @@
-﻿// Undone: 1.update button implement
-// Undone: 2.Temperature and Operation save and load class
-// Undone: 3.Textbox handler (if input is not number) 
+﻿// Undone: 3.Textbox handler (if input is not number) 
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +13,7 @@ namespace ConductTempControl_ForPC
 {
     public partial class ParameterSet : Form
     {
-        private TextBox[] TxtParas = new TextBox[8];
+        private TextBox[] TxtParas = new TextBox[GlbVars.paraValues.Length];
 
         public ParameterSet()
         {
@@ -31,6 +29,7 @@ namespace ConductTempControl_ForPC
             TxtParas[5] = TxtIntegral;
             TxtParas[6] = TxtPower;
             TxtParas[7] = TxtFlucThr;
+            TxtParas[8] = TxtTempThr;
         }
 
         #region Non-Control Methods
@@ -47,8 +46,7 @@ namespace ConductTempControl_ForPC
             {
                 // FlucThr & TempThr cannot be read from MCU
                 // They will be read from file and save to memory at the beginning of Main Form
-                if (i == (int)GlbVars.Paras_t.FlucThr ||
-                    i == (int)GlbVars.Paras_t.TempThr)
+                if (i == (int)GlbVars.Paras_t.FlucThr || i == (int)GlbVars.Paras_t.TempThr)
                 {
                     paraValues[i] = GlbVars.paraValues[i];
                     continue;
@@ -61,11 +59,13 @@ namespace ConductTempControl_ForPC
         }
         #endregion
 
+        #region Control Methods
         private void ParameterSet_Load(object sender, EventArgs e)
         {
             if (GlbVars.firstReadPara)
             {
                 GlbVars.paraValues = readParas();
+                GlbVars.firstReadPara = false;
             }
             
             for(int i=0; i<GlbVars.paraValues.Length; i++)
@@ -86,7 +86,49 @@ namespace ConductTempControl_ForPC
 
         private void BntUpdate_Click(object sender, EventArgs e)
         {
+            bool noError = true;
 
+            // Write old parameters to file
+            Data2File.Operation2File(true);
+
+            // Loop to check and update paramters
+            for (int i=0; i<GlbVars.paraValues.Length; i++)
+            {
+                float newValue = float.Parse(TxtParas[i].Text);
+
+                // Update only when current value is different from previous one
+                // Use **abs(x-y) > margin** to compare two inequal float vars 
+                if (Math.Abs(newValue - GlbVars.paraValues[i]) >　10e-5)   
+                {
+                    // If update fluctuation and temperature threshold, just update the global variables
+                    if (i == (int)GlbVars.Paras_t.FlucThr || i == (int)GlbVars.Paras_t.TempThr)
+                    {
+                        GlbVars.paraValues[i] = newValue;
+                        Data2File.AddParaChanged(i);
+                        continue;
+                    }
+
+                    // For other parameters, send cmd to MCU to update 
+                    if (GlbVars.uartCom.SendData((UartProtocol.Commands_t)i, newValue) != UartProtocol.Errors_t.NoError)
+                    {
+                        noError = false;
+                    }
+                    else
+                    {
+                        GlbVars.paraValues[i] = newValue;
+                        Data2File.AddParaChanged(i);
+                    }
+                }
+            }
+
+            if (noError)
+                MessageBox.Show("参数更新成功！");
+            else
+                MessageBox.Show("参数更新失败！");
+
+            // Write new paramters to file
+            Data2File.Operation2File(false);
         }
+        #endregion
     }
 }

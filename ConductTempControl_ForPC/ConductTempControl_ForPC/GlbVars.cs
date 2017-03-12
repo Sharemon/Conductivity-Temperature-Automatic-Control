@@ -43,8 +43,11 @@ namespace ConductTempControl_ForPC
 
         public static List<float> temperatures = new List<float>();
 
-        public static float[] paraValues  = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-        public static string[] paraFormat = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0.000" };
+        public static float[] paraValues   = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+        public static string[] paraFormat  = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0.000" };
+        public static string[] paraChNames = 
+            { "设定值    ", "调整值    ", "超前调整值", "模糊系数  ", "比例系数  ", "积分系数  ", "功率系数  ", "波动度阈值", "温度阈值  " };
+
         public static bool firstReadPara = true;
 
         // Todo: Need to be Initialized at the start of Main Form;

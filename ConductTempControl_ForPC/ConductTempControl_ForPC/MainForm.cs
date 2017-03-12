@@ -14,39 +14,39 @@ namespace ConductTempControl_ForPC
     /// </summary>
     public partial class MainForm : Form
     {
-        UartProtocol uart;
 
         public MainForm()
         {
             InitializeComponent();
+
+            // Check and create folders for data saving
+            Data2File.CheckDirs();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             // Todo: The first thing is to initialize uartCom.portName
             // Todo: The second thing is to read FlucThr and TempThr from .ini file
+            //Todo: Create dirs at the beginning of Main Form
             //GlobalVars.InitGlobalVars();
-            uart = new UartProtocol("COM1");
-            char a = 'a';
-            this.Text = a.ToString();
+            GlbVars.uartCom = new UartProtocol("COM1");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            uart.SendData(UartProtocol.Commands_t.Fuzzy, 123);
 
             GlbVars.ctrlStartTime = DateTime.Now;
 
             Timer t1 = new Timer();
             t1.Interval = GlbVars.readTempInterval;
             t1.Tick += timer1_tick;
-            //t1.Enabled = true;
+            t1.Enabled = true;
             //GlobalVars.AddTemperature(0.0f);
 
             bool formExist = false;
             foreach(Form fm in Application.OpenForms)
             {
-                if (fm.Name == "TemperatureChart")
+                if (fm.Name == "ParameterSet")
                 {
                     fm.BringToFront();
                     formExist = true;
@@ -54,7 +54,7 @@ namespace ConductTempControl_ForPC
             }
             if (!formExist)
             {
-                TemperatureChart fm = new TemperatureChart();
+                ParameterSet fm = new ParameterSet();
                 fm.Show();
             }
         }
