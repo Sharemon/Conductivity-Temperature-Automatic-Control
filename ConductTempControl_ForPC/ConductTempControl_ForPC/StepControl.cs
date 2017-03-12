@@ -9,8 +9,8 @@ namespace ConductTempControl_ForPC
     {
 
         #region Members
-        private const float flucThr   = 0.005f;
-        private const float tempThr   = 0.005f;
+        //private const float flucThr   = 0.005f;
+        //private const float tempThr   = 0.005f;
         //private const int repeatTimes = 8;
 
         private float tempSetCurrent  = 0;
@@ -19,7 +19,7 @@ namespace ConductTempControl_ForPC
         //private float tempSetLast     = 0;
         private bool tempSetOrient    = true;      // True for +, false for -
 
-        private UartProtocol uartCom = new UartProtocol(GlobalVars.portName);
+        //private UartProtocol uartCom = new UartProtocol(GlobalVars.portName);
         #endregion
 
         #region Constructor
@@ -56,8 +56,8 @@ namespace ConductTempControl_ForPC
                 this.tempSetCurrent = tempSetCurrent - tempSetInterval;
             }
 
-            // Todo: Need remove all uart error judgement?
-            if (uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
+            // Improve: Need remove all uart error judgement?
+            if (GlbVars.uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
                 != UartProtocol.Errors_t.NoError)
             {
                 Exception e = new Exception(" Communication command is in error !!!");
@@ -79,8 +79,8 @@ namespace ConductTempControl_ForPC
         /// </summary>
         public void ThisTurn()
         {
-            // Todo: Need remove all uart error judgement?
-            if (uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
+            // Improve: Need remove all uart error judgement?
+            if (GlbVars.uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
                 != UartProtocol.Errors_t.NoError)
             {
                 Exception e = new Exception(" Communication command is in error !!!");
@@ -113,8 +113,8 @@ namespace ConductTempControl_ForPC
         {
             float tempareture = 0;
 
-            // Todo: Need remove all uart error judgement?
-            if (uartCom.ReadData(UartProtocol.Commands_t.TempSet, out tempareture)
+            // Improve: Need remove all uart error judgement?
+            if (GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempSet, out tempareture)
                 != UartProtocol.Errors_t.NoError)
             {
                 Exception e = new Exception(" Communication command is in error !!!");
@@ -124,14 +124,14 @@ namespace ConductTempControl_ForPC
             float fluctuation = 0;
 
             // If there not enough temperature point to check fluctuation, consider it not in range
-            if ( !GlobalVars.GetFluc(count, out fluctuation))
+            if ( !GlbVars.GetFluc(count, out fluctuation))
             {
                 return false;
             }
 
             // If temperature and fluctuation are both in range, return true
-            if (Math.Abs(tempareture - this.tempSetCurrent) < tempThr ||
-                fluctuation < flucThr)
+            if (Math.Abs(tempareture - this.tempSetCurrent) < GlbVars.paraValues[(int)GlbVars.Paras_t.TempThr] ||
+                fluctuation < GlbVars.paraValues[(int)GlbVars.Paras_t.FlucThr])
             {
                 return true;
             }
@@ -151,15 +151,6 @@ namespace ConductTempControl_ForPC
             System.Threading.Thread.Sleep(1000 * 60 * 2);
 
             return true;
-        }
-
-        /// <summary>
-        /// Change serial port for auto-control mode
-        /// </summary>
-        /// <param name="portName">Port Name</param>
-        public void SetPort(string portName)
-        {
-            uartCom.SetPort(portName);
         }
 
         #endregion

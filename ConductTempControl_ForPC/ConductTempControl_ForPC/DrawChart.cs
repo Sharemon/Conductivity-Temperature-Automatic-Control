@@ -111,14 +111,14 @@ namespace ConductTempControl_ForPC
         /// </summary>
         private void MoveTempLocal()
         {
-            if (GlobalVars.temperatures.Count < tempChartFixLen)
+            if (GlbVars.temperatures.Count < tempChartFixLen)
             {
-                tempListForChart = GlobalVars.temperatures.GetRange(0, GlobalVars.temperatures.Count);
+                tempListForChart = GlbVars.temperatures.GetRange(0, GlbVars.temperatures.Count);
             }
             else
             {
-                tempListForChart = GlobalVars.temperatures.GetRange
-                    (GlobalVars.temperatures.Count - tempChartFixLen, tempChartFixLen);
+                tempListForChart = GlbVars.temperatures.GetRange
+                    (GlbVars.temperatures.Count - tempChartFixLen, tempChartFixLen);
             }
 
             // Calculate the Max and Min
@@ -147,12 +147,12 @@ namespace ConductTempControl_ForPC
         {
             List<int[]> timeTags = new List<int[]>();
 
-            int minuteInterval = timeColInt * GlobalVars.readTempInterval / 1000;
+            int minuteInterval = timeColInt * GlbVars.readTempInterval / 1000;
 
             DateTime dt = DateTime.Now;
             int hour = dt.Hour;
             int minute = (int)Math.Round(dt.Minute + (float)dt.Second / 60.0     // 60.0 means 1min = 60s
-                - (tempListForChart.Count * GlobalVars.readTempInterval / 1000 / 60.0) - minuteInterval);
+                - (tempListForChart.Count * GlbVars.readTempInterval / 1000 / 60.0) - minuteInterval);
             
             // Avoid a minus minute
             if (minute < 0)

@@ -23,7 +23,8 @@ namespace ConductTempControl_ForPC
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            // 
+            // Todo: The first thing is to initialize uartCom.portName
+            // Todo: The second thing is to read FlucThr and TempThr from .ini file
             //GlobalVars.InitGlobalVars();
             uart = new UartProtocol("COM1");
             char a = 'a';
@@ -32,12 +33,14 @@ namespace ConductTempControl_ForPC
 
         private void button1_Click(object sender, EventArgs e)
         {
-            GlobalVars.ctrlStartTime = DateTime.Now;
+            uart.SendData(UartProtocol.Commands_t.Fuzzy, 123);
+
+            GlbVars.ctrlStartTime = DateTime.Now;
 
             Timer t1 = new Timer();
-            t1.Interval = GlobalVars.readTempInterval;
+            t1.Interval = GlbVars.readTempInterval;
             t1.Tick += timer1_tick;
-            t1.Enabled = true;
+            //t1.Enabled = true;
             //GlobalVars.AddTemperature(0.0f);
 
             bool formExist = false;
@@ -59,10 +62,10 @@ namespace ConductTempControl_ForPC
         private void timer1_tick(object sender, EventArgs e)
         {
             Random rn = new Random();
-            GlobalVars.AddTemperature((float)rn.NextDouble());
+            GlbVars.AddTemperature((float)rn.NextDouble());
         }
 
-        private void test(GlobalVars.Parameters_t arg1)
+        private void test(GlbVars.Paras_t arg1)
         {
 
         }

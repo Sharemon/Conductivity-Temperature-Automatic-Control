@@ -65,14 +65,14 @@ namespace ConductTempControl_ForPC
             PowerShow
         };
         
-        private const string commandHead_W          = "@35W";
-        private const string commandHead_R          = "@35R";
-        private readonly string[] commandWords      = { "A", "B", "C", "D", "E", "F", "G", "H", "I"};
-        private readonly string[] commandFormats    = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0" };
-        private const string commandFinish          = ":";
-        private const string commandEnd             = "\r"; // Todo: The endflag may be \r\n, check it.
+        private const string cmdHead_W          = "@35W";
+        private const string cmdHead_R          = "@35R";
+        private readonly string[] cmdWords      = { "A", "B", "C", "D", "E", "F", "G", "H", "I"};
+        private readonly string[] cmdFormats    = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0" };
+        private const string cmdFinish          = ":";
+        private const string cmdEnd             = "\r"; // Todo: The endflag may be \r\n, check it.
 
-        private readonly string[] commandRW         = { "w", "w", "w", "w", "w", "w", "w", "r", "r" };
+        private readonly string[] cmdRW         = { "w", "w", "w", "w", "w", "w", "w", "r", "r" };
         #endregion
 
         #endregion
@@ -98,7 +98,7 @@ namespace ConductTempControl_ForPC
         {
             this.sp.PortName = portName;
             // Keep the GlobalVars.portName is always the latest.
-            GlobalVars.portName = portName;
+            GlbVars.portName = portName;
         }
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace ConductTempControl_ForPC
         /// <param name="value">Value of Command</param>
         public Errors_t SendData(Commands_t commandName, float value)
         {
-            // Todo: Check if can remove this and commandRW when development finishes.
+            // Improve: Check if can remove this and commandRW when development finishes.
             // If the command cannot be write, throw an exception
-            if (commandRW[(int)commandName] != "w")
+            if (cmdRW[(int)commandName] != "w")
             {
                 Exception e = new Exception
                     (String.Format("This parameter {0} cannot be write",Enum.GetName(commandName.GetType(), commandName)));
@@ -189,8 +189,21 @@ namespace ConductTempControl_ForPC
             //Improve: Consoder if it's necessary to use sub thread to read serial port data
             // ...
             Thread.Sleep(intervalOfWR);
-            //Improve: Add exception handler for read timeout
-            string readString = this.sp.ReadTo(commandFinish);
+            //Todo: Add exception handler for read timeout
+            string readString = "";
+            try
+            {
+                readString = this.sp.ReadTo(cmdFinish);
+            }
+            catch (Exception)
+            {
+                System.Windows.Forms.MessageBox.Show("通讯中断，请检查连接！\r\n点击确定重新启动程序");
+                readString = "";
+
+                System.Windows.Forms.Application.Restart();
+                Environment.Exit(Environment.ExitCode);
+            }
+            
             //Improve: Add BCC checker
             sp.DiscardInBuffer();
             return readString;
@@ -209,20 +222,20 @@ namespace ConductTempControl_ForPC
 
             if (W_R)
             {
-                command += commandHead_W;
-                command += commandWords[(int)commandName];
-                command += value.ToString(commandFormats[(int)commandName]);
-                command += commandFinish;
+                command += cmdHead_W;
+                command += cmdWords[(int)commandName];
+                command += value.ToString(cmdFormats[(int)commandName]);
+                command += cmdFinish;
                 command += BCCCal(command, false);
-                command += commandEnd;
+                command += cmdEnd;
             }
             else
             {
-                command += commandHead_R;
-                command += commandWords[(int)commandName];
-                command += commandFinish;
+                command += cmdHead_R;
+                command += cmdWords[(int)commandName];
+                command += cmdFinish;
                 command += BCCCal(command, false);
-                command += commandEnd;
+                command += cmdEnd;
             }
 
             return command;

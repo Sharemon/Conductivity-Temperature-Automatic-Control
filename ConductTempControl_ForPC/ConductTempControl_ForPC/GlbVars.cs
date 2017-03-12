@@ -9,13 +9,13 @@ namespace ConductTempControl_ForPC
     /// <summary>
     /// Class for saving global variables
     /// </summary>
-    static class GlobalVars
+    static class GlbVars
     {
         #region Define
         /// <summary>
         /// List all parameters.
         /// </summary>
-        public enum Parameters_t
+        public enum Paras_t
         {
             TempSet = 0,
             TempCorrect,
@@ -24,7 +24,8 @@ namespace ConductTempControl_ForPC
             Ratio,
             Integral,
             Power,
-            Fluctuation
+            FlucThr,
+            TempThr
         };
         #endregion
 
@@ -40,18 +41,22 @@ namespace ConductTempControl_ForPC
         public static int tempFlucLen_5min  = 5 * 60 / (readTempInterval / 1000);
         public static int tempFlucLen_2min  = 2 * 60 / (readTempInterval / 1000);
 
-        public static List<float> temperatures  = new List<float>();
+        public static List<float> temperatures = new List<float>();
 
-        public static float[] parameterValues  = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };  
-         
-        public static string portName          = "";
+        public static float[] paraValues  = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+        public static string[] paraFormat = { "0.000", "0.000", "0.000", "0", "0", "0", "0", "0.000", "0.000" };
+        public static bool firstReadPara = true;
+
+        // Todo: Need to be Initialized at the start of Main Form;
+        public static UartProtocol uartCom;
+        public static string portName = "";
         #endregion
 
         #region Contructor -- Init variables
         /// <summary>
         /// Do not use.
         /// </summary>
-        static GlobalVars()
+        static GlbVars()
         {
             ;
         }
@@ -67,7 +72,7 @@ namespace ConductTempControl_ForPC
         /// <returns>If the max and min can be trusted</returns>
         public static bool GetMaxMin(int count, out float tempMax, out float tempMin)
         {
-            if(GlobalVars.temperatures.Count == 0 || GlobalVars.temperatures.Count < count)
+            if(GlbVars.temperatures.Count == 0 || GlbVars.temperatures.Count < count)
             {
                 // If there is not temperature data in list, output extreme max and min value
                 tempMax = 10000;
@@ -77,8 +82,8 @@ namespace ConductTempControl_ForPC
             }
             else
             {
-                tempMax = GlobalVars.temperatures.GetRange(temperatures.Count - count, count).Max();
-                tempMin = GlobalVars.temperatures.GetRange(temperatures.Count - count, count).Min();
+                tempMax = GlbVars.temperatures.GetRange(temperatures.Count - count, count).Max();
+                tempMin = GlbVars.temperatures.GetRange(temperatures.Count - count, count).Min();
                 return true;
             }
         }
@@ -91,7 +96,7 @@ namespace ConductTempControl_ForPC
         /// <returns>If the max and min can be trusted</returns>
         public static bool GetFluc(int count, out float fluctuation)
         {
-            if (GlobalVars.temperatures.Count == 0 || GlobalVars.temperatures.Count < count)
+            if (GlbVars.temperatures.Count == 0 || GlbVars.temperatures.Count < count)
             {
                 // If there is not temperature data in list, output extreme fluctuation
                 fluctuation = -1;
@@ -99,8 +104,8 @@ namespace ConductTempControl_ForPC
             }
             else
             {
-                fluctuation = GlobalVars.temperatures.GetRange(temperatures.Count - count, count).Max() -
-                    GlobalVars.temperatures.GetRange(temperatures.Count - count, count).Min();
+                fluctuation = GlbVars.temperatures.GetRange(temperatures.Count - count, count).Max() -
+                    GlbVars.temperatures.GetRange(temperatures.Count - count, count).Min();
                 return true;
             }
         }

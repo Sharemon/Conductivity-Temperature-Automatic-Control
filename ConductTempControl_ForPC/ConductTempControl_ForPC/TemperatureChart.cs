@@ -60,11 +60,11 @@ namespace ConductTempControl_ForPC
         /// <param name="e"></param>
         private void CtrlTimer_Tick(object sender, EventArgs e)
         {
-            TimeSpan ts = DateTime.Now - GlobalVars.ctrlStartTime;
+            TimeSpan ts = DateTime.Now - GlbVars.ctrlStartTime;
             LblCtrlTimeShow.Text = String.Format("{0}:{1}:{2}", ts.Hours, ts.Minutes, ts.Seconds);
 
             float fluc = 0;
-            if (GlobalVars.GetFluc(GlobalVars.tempFlucLen_10min, out fluc))
+            if (GlbVars.GetFluc(GlbVars.tempFlucLen_10min, out fluc))
             {
                 LblFlucShow.Text = fluc.ToString("0.000");
             }
@@ -76,7 +76,7 @@ namespace ConductTempControl_ForPC
 
         private void BtnClear_Click(object sender, EventArgs e)
         {
-            GlobalVars.temperatures.Clear();
+            GlbVars.temperatures.Clear();
         }
 
         private void TemperatureChart_FormClosing(object sender, FormClosingEventArgs e)
