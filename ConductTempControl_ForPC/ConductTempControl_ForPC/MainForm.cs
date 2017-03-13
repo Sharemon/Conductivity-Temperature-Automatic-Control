@@ -34,13 +34,6 @@ namespace ConductTempControl_ForPC
 
         private void button1_Click(object sender, EventArgs e)
         {
-
-            GlbVars.ctrlStartTime = DateTime.Now;
-
-            Timer t1 = new Timer();
-            t1.Interval = GlbVars.readTempInterval;
-            t1.Tick += timer1_tick;
-            t1.Enabled = true;
             //GlobalVars.AddTemperature(0.0f);
 
             bool formExist = false;
@@ -61,13 +54,52 @@ namespace ConductTempControl_ForPC
 
         private void timer1_tick(object sender, EventArgs e)
         {
-            Random rn = new Random();
-            GlbVars.AddTemperature((float)rn.NextDouble());
+            float data = 0;
+            GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempShow, out data);
+            GlbVars.AddTemperature(data);
         }
 
-        private void test(GlbVars.Paras_t arg1)
+        private void button2_Click(object sender, EventArgs e)
         {
+            GlbVars.ctrlStartTime = DateTime.Now;
 
+            System.Timers.Timer t1 = GlbVars.tempReadTimer;
+            t1.Interval = GlbVars.readTempInterval;
+            t1.Elapsed += timer1_tick;
+            t1.Enabled = true;
+
+            bool formExist = false;
+            foreach (Form fm in Application.OpenForms)
+            {
+                if (fm.Name == "TemperatureChart")
+                {
+                    fm.BringToFront();
+                    formExist = true;
+                }
+            }
+            if (!formExist)
+            {
+                TemperatureChart fm = new TemperatureChart();
+                fm.Show();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            bool formExist = false;
+            foreach (Form fm in Application.OpenForms)
+            {
+                if (fm.Name == "LogShow")
+                {
+                    fm.BringToFront();
+                    formExist = true;
+                }
+            }
+            if (!formExist)
+            {
+                LogShow fm = new LogShow();
+                fm.Show();
+            }
         }
     }
 }

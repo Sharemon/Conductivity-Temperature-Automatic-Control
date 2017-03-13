@@ -1,6 +1,4 @@
-﻿// Undone: 3.Textbox handler (if input is not number) 
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -62,6 +60,11 @@ namespace ConductTempControl_ForPC
         #region Control Methods
         private void ParameterSet_Load(object sender, EventArgs e)
         {
+            // Todo: Think of if it's needed to close timer
+            // Disable read temperature timer to avoid serial port conflict
+            //GlbVars.tempReadTimer.Enabled = false;
+
+            // Load parameters and update UI;
             if (GlbVars.firstReadPara)
             {
                 GlbVars.paraValues = readParas();
@@ -128,6 +131,30 @@ namespace ConductTempControl_ForPC
 
             // Write new paramters to file
             Data2File.Operation2File(false);
+        }
+        
+        /// <summary>
+        /// To make sure all input value is valid
+        /// Use one delegate for all textboxes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TxtPara_TextChanged(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            float noUse = 0;
+
+            if(txt.Text != "-" && txt.Text != "+" /*&& txt.Text != "."*/ && txt.Text != "" &&
+                !float.TryParse(txt.Text, out noUse))
+            {
+                txt.Text = txt.Text.Remove(txt.Text.Length - 1, 1);
+                txt.Select(txt.Text.Length, 0);
+            }
+        }
+
+        private void ParameterSet_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ;
         }
         #endregion
     }

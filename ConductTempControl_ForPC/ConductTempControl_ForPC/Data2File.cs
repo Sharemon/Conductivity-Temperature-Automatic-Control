@@ -32,7 +32,7 @@ namespace ConductTempControl_ForPC
 
         #region Methods
         /// <summary>
-        /// Create directory for operation and temperature saving
+        /// Check directory for operation and temperature saving
         /// </summary>
         //Todo: Create dirs at the beginning of Main Form
         public static void CheckDirs()
@@ -71,17 +71,18 @@ namespace ConductTempControl_ForPC
         public static void Operation2File(bool old)
         {
             // Create dirs if necessary
-            // Already checked at the start of application
-            // CheckDirs();
+            CheckDirs();
 
             // If saving old parameters, just save them
             if (old)
             {
-                operFilePath = operFolder + "\\" + DateTime.Now.ToString("yyMMdd_HHmmss") + ".log";
+                operFilePath = operFolder + "\\" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".log";
 
                 // "using" will automatically CLOSE and DISPOSE the parameter created in bracket
                 using (StreamWriter oper = new StreamWriter(operFilePath, false))
                 {
+                    oper.WriteLine("  操作前->\r\n");
+
                     for (int i = 0; i < GlbVars.paraValues.Length; i++)
                         oper.WriteLine(unmark + GlbVars.paraChNames[i] + "\t\t" + GlbVars.paraValues[i].ToString(GlbVars.paraFormat[i]));
                 }
@@ -91,7 +92,7 @@ namespace ConductTempControl_ForPC
             {
                 using (StreamWriter oper = new StreamWriter(operFilePath, true))
                 {
-                    oper.WriteLine("\r\n  ->\r\n");
+                    oper.WriteLine("\r\n  操作后->\r\n");
 
                     for (int i = 0; i < GlbVars.paraValues.Length; i++)
                     {
@@ -106,6 +107,15 @@ namespace ConductTempControl_ForPC
                 // Clear changed parameter list 
                 paraChangeds.Clear();
             }
+        }
+
+        /// <summary>
+        /// Get folder of operation saving data
+        /// </summary>
+        /// <returns>Folder of operation data</returns>
+        public static string GetOperFolder()
+        {
+            return operFolder;
         }
         #endregion
     }

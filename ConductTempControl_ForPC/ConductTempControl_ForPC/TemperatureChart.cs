@@ -12,8 +12,8 @@ namespace ConductTempControl_ForPC
     public partial class TemperatureChart : Form
     {
         #region Members
-        Timer tempShowTimer;
-        Timer ctrlTimer;
+        System.Timers.Timer tempShowTimer;
+        System.Timers.Timer ctrlTimer;
         DrawChart mDrawChart;
         #endregion
 
@@ -23,12 +23,12 @@ namespace ConductTempControl_ForPC
             mDrawChart = new DrawChart(TempPic.Height, TempPic.Width, 11, 7);
 
             // Init Temperature Show Timer
-            tempShowTimer = new Timer();
-            tempShowTimer.Tick += TempShowTimer_Tick;
+            tempShowTimer = new System.Timers.Timer();
+            tempShowTimer.Elapsed += TempShowTimer_Tick;
 
             // Init Control Time Timer
-            ctrlTimer = new Timer();
-            ctrlTimer.Tick += CtrlTimer_Tick;
+            ctrlTimer = new System.Timers.Timer();
+            ctrlTimer.Elapsed += CtrlTimer_Tick;
         }
 
         private void TemperatureChart_Load(object sender, EventArgs e)
@@ -50,7 +50,10 @@ namespace ConductTempControl_ForPC
         /// <param name="e"></param>
         private void TempShowTimer_Tick(object sender, EventArgs e)
         {
-            TempPic.Image = mDrawChart.Draw();
+            this.Invoke(new EventHandler(delegate
+            {
+                TempPic.Image = mDrawChart.Draw();
+            }));
         }
 
         /// <summary>
@@ -60,18 +63,21 @@ namespace ConductTempControl_ForPC
         /// <param name="e"></param>
         private void CtrlTimer_Tick(object sender, EventArgs e)
         {
-            TimeSpan ts = DateTime.Now - GlbVars.ctrlStartTime;
-            LblCtrlTimeShow.Text = String.Format("{0}:{1}:{2}", ts.Hours, ts.Minutes, ts.Seconds);
+            this.Invoke(new EventHandler(delegate
+            {
+                TimeSpan ts = DateTime.Now - GlbVars.ctrlStartTime;
+                LblCtrlTimeShow.Text = String.Format("{0}:{1}:{2}", ts.Hours, ts.Minutes, ts.Seconds);
 
-            float fluc = 0;
-            if (GlbVars.GetFluc(GlbVars.tempFlucLen_10min, out fluc))
-            {
-                LblFlucShow.Text = fluc.ToString("0.000");
-            }
-            else
-            {
-                LblFlucShow.Text = "N/A";
-            }
+                float fluc = 0;
+                if (GlbVars.GetFluc(GlbVars.tempFlucLen_10min, out fluc))
+                {
+                    LblFlucShow.Text = fluc.ToString("0.000");
+                }
+                else
+                {
+                    LblFlucShow.Text = "N/A";
+                }
+            }));
         }
 
         private void BtnClear_Click(object sender, EventArgs e)

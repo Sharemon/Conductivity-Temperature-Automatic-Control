@@ -137,6 +137,7 @@
             this.TxtTempSet.Name = "TxtTempSet";
             this.TxtTempSet.Size = new System.Drawing.Size(100, 23);
             this.TxtTempSet.TabIndex = 2;
+            this.TxtTempSet.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtTempCorrect
             // 
@@ -145,6 +146,7 @@
             this.TxtTempCorrect.Name = "TxtTempCorrect";
             this.TxtTempCorrect.Size = new System.Drawing.Size(100, 23);
             this.TxtTempCorrect.TabIndex = 2;
+            this.TxtTempCorrect.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtLeadAdjust
             // 
@@ -153,6 +155,7 @@
             this.TxtLeadAdjust.Name = "TxtLeadAdjust";
             this.TxtLeadAdjust.Size = new System.Drawing.Size(100, 23);
             this.TxtLeadAdjust.TabIndex = 2;
+            this.TxtLeadAdjust.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtFuzzy
             // 
@@ -161,6 +164,7 @@
             this.TxtFuzzy.Name = "TxtFuzzy";
             this.TxtFuzzy.Size = new System.Drawing.Size(100, 23);
             this.TxtFuzzy.TabIndex = 2;
+            this.TxtFuzzy.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtRatio
             // 
@@ -169,6 +173,7 @@
             this.TxtRatio.Name = "TxtRatio";
             this.TxtRatio.Size = new System.Drawing.Size(100, 23);
             this.TxtRatio.TabIndex = 2;
+            this.TxtRatio.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtIntegral
             // 
@@ -177,6 +182,7 @@
             this.TxtIntegral.Name = "TxtIntegral";
             this.TxtIntegral.Size = new System.Drawing.Size(100, 23);
             this.TxtIntegral.TabIndex = 2;
+            this.TxtIntegral.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtPower
             // 
@@ -185,6 +191,7 @@
             this.TxtPower.Name = "TxtPower";
             this.TxtPower.Size = new System.Drawing.Size(100, 23);
             this.TxtPower.TabIndex = 2;
+            this.TxtPower.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // TxtFlucThr
             // 
@@ -193,6 +200,7 @@
             this.TxtFlucThr.Name = "TxtFlucThr";
             this.TxtFlucThr.Size = new System.Drawing.Size(100, 23);
             this.TxtFlucThr.TabIndex = 2;
+            this.TxtFlucThr.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // BntRead
             // 
@@ -223,6 +231,7 @@
             this.TxtTempThr.Name = "TxtTempThr";
             this.TxtTempThr.Size = new System.Drawing.Size(100, 23);
             this.TxtTempThr.TabIndex = 2;
+            this.TxtTempThr.TextChanged += new System.EventHandler(this.TxtPara_TextChanged);
             // 
             // label9
             // 
@@ -261,6 +270,7 @@
             this.Controls.Add(this.label1);
             this.Name = "ParameterSet";
             this.Text = "ParameterSet";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ParameterSet_FormClosing);
             this.Load += new System.EventHandler(this.ParameterSet_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

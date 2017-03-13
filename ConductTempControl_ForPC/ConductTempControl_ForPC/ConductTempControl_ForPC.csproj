@@ -138,6 +138,9 @@
       <DependentUpon>TemperatureChart.cs</DependentUpon>
     </Compile>
     <Compile Include="UartProtocol.cs" />
+    <EmbeddedResource Include="LogShow.resx">
+      <DependentUpon>LogShow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

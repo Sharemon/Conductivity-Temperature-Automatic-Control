@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Timers;
 
 namespace ConductTempControl_ForPC
 {
@@ -30,6 +31,8 @@ namespace ConductTempControl_ForPC
         #endregion
 
         #region Members -- global variables
+        public static Timer tempReadTimer = new Timer();
+
         public static DateTime ctrlStartTime;
         public static int readTempInterval = 1000;
         private const int tempMaxLen       = 1000; 
