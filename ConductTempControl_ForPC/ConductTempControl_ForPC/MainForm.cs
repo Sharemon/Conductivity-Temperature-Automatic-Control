@@ -15,6 +15,7 @@ namespace ConductTempControl_ForPC
     public partial class MainForm : Form
     {
 
+
         public MainForm()
         {
             InitializeComponent();
@@ -100,6 +101,40 @@ namespace ConductTempControl_ForPC
                 LogShow fm = new LogShow();
                 fm.Show();
             }
+        }
+
+        /// <summary>
+        /// Redraw picture box to circle shape
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FlucShow_Paint(object sender, PaintEventArgs e)
+        {
+            System.Drawing.Drawing2D.GraphicsPath buttonPath =
+                new System.Drawing.Drawing2D.GraphicsPath();
+
+            System.Drawing.Rectangle newRectangle = FlucShow.ClientRectangle;
+
+            // Decrease the size of the rectangle.
+            newRectangle.Inflate(-10, -10);
+
+            // Draw the button's border.
+            e.Graphics.DrawEllipse(System.Drawing.Pens.Transparent, newRectangle);
+
+            // Increase the size of the rectangle to include the border.
+            newRectangle.Inflate(1, 1);
+
+            // Create a circle within the new rectangle.
+            buttonPath.AddEllipse(newRectangle);
+
+            // Set the button's Region property to the newly created 
+            // circle region.
+            FlucShow.Region = new System.Drawing.Region(buttonPath);
+        }
+
+        private void BntRunAuto_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
