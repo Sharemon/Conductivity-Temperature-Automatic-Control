@@ -79,16 +79,25 @@ namespace ConductTempControl_ForPC
 
         private void BntRead_Click(object sender, EventArgs e)
         {
+            // Enter non-timer region to avoid uart conflict
+            GlbVars.tempReadTimer.Enabled = false;
+
             GlbVars.paraValues = readParas();
 
             for (int i = 0; i < GlbVars.paraValues.Length; i++)
             {
                 TxtParas[i].Text = GlbVars.paraValues[i].ToString(GlbVars.paraFormat[i]);
             }
+
+            // Exit non-timer region
+            GlbVars.tempReadTimer.Enabled = true;
         }
 
         private void BntUpdate_Click(object sender, EventArgs e)
         {
+            // Enter non-timer region to avoid uart conflict
+            GlbVars.tempReadTimer.Enabled = false;
+
             bool noError = true;
 
             // Write old parameters to file
@@ -131,6 +140,9 @@ namespace ConductTempControl_ForPC
 
             // Write new paramters to file
             Data2File.Operation2File(false);
+
+            // Exit non-timer region
+            GlbVars.tempReadTimer.Enabled = true;
         }
         
         /// <summary>
