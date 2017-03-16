@@ -31,6 +31,7 @@ namespace ConductTempControl_ForPC
         #endregion
 
         #region Members -- global variables
+        private static bool tempReadTimerEnable = false;
         public static Timer tempReadTimer = new Timer();
 
         public static DateTime ctrlStartTime;
@@ -127,6 +128,30 @@ namespace ConductTempControl_ForPC
                 temperatures.RemoveAt(0);
             }
             temperatures.Add(data);
+        }
+
+        /// <summary>
+        /// Enter no timer region to avoid uart confilct
+        /// </summary>
+        public static void EnterNoTimerRegion()
+        {
+            if (GlbVars.tempReadTimer.Enabled)
+                GlbVars.tempReadTimerEnable = true;
+            else
+                GlbVars.tempReadTimerEnable = false;
+
+            GlbVars.tempReadTimer.Enabled = false;
+        }
+
+        /// <summary>
+        /// Exit no timer region to avoid uart confilct
+        /// </summary>
+        public static void ExitNoTimerRegion()
+        {
+            if (GlbVars.tempReadTimerEnable)
+                GlbVars.tempReadTimer.Enabled = true;
+            else
+                GlbVars.tempReadTimer.Enabled = false;
         }
         #endregion
     }

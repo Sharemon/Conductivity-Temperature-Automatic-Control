@@ -30,7 +30,7 @@
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.MenuSetting = new System.Windows.Forms.ToolStripMenuItem();
-            this.串口设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuComSet = new System.Windows.Forms.ToolStripMenuItem();
             this.参数设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.曲线图ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,6 +38,7 @@
             this.操作日志ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.LblTempShowAuto = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.FlucShow = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
@@ -45,10 +46,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.FlucShow = new System.Windows.Forms.PictureBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StaCom = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FlucShow)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -65,22 +68,23 @@
             // MenuSetting
             // 
             this.MenuSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.串口设置ToolStripMenuItem,
+            this.MenuComSet,
             this.参数设置ToolStripMenuItem});
             this.MenuSetting.Name = "MenuSetting";
             this.MenuSetting.Size = new System.Drawing.Size(44, 21);
             this.MenuSetting.Text = "设置";
             // 
-            // 串口设置ToolStripMenuItem
+            // MenuComSet
             // 
-            this.串口设置ToolStripMenuItem.Name = "串口设置ToolStripMenuItem";
-            this.串口设置ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
-            this.串口设置ToolStripMenuItem.Text = "串口设置";
+            this.MenuComSet.Name = "MenuComSet";
+            this.MenuComSet.Size = new System.Drawing.Size(152, 22);
+            this.MenuComSet.Text = "串口设置";
+            this.MenuComSet.Click += new System.EventHandler(this.MenuComSet_Click);
             // 
             // 参数设置ToolStripMenuItem
             // 
             this.参数设置ToolStripMenuItem.Name = "参数设置ToolStripMenuItem";
-            this.参数设置ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.参数设置ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.参数设置ToolStripMenuItem.Text = "参数设置";
             // 
             // 显示ToolStripMenuItem
@@ -96,19 +100,19 @@
             // 曲线图ToolStripMenuItem
             // 
             this.曲线图ToolStripMenuItem.Name = "曲线图ToolStripMenuItem";
-            this.曲线图ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.曲线图ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.曲线图ToolStripMenuItem.Text = "手动操作";
             // 
             // 操作日志ToolStripMenuItem
             // 
             this.操作日志ToolStripMenuItem.Name = "操作日志ToolStripMenuItem";
-            this.操作日志ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.操作日志ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.操作日志ToolStripMenuItem.Text = "曲线图";
             // 
             // 操作日志ToolStripMenuItem1
             // 
             this.操作日志ToolStripMenuItem1.Name = "操作日志ToolStripMenuItem1";
-            this.操作日志ToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.操作日志ToolStripMenuItem1.Size = new System.Drawing.Size(124, 22);
             this.操作日志ToolStripMenuItem1.Text = "操作日志";
             // 
             // LblTempShowAuto
@@ -134,12 +138,24 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "当前温度显示";
             // 
+            // FlucShow
+            // 
+            this.FlucShow.BackColor = System.Drawing.Color.Red;
+            this.FlucShow.Location = new System.Drawing.Point(6, 34);
+            this.FlucShow.Name = "FlucShow";
+            this.FlucShow.Size = new System.Drawing.Size(40, 40);
+            this.FlucShow.TabIndex = 5;
+            this.FlucShow.TabStop = false;
+            this.FlucShow.Paint += new System.Windows.Forms.PaintEventHandler(this.FlucShow_Paint);
+            // 
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(38, 186);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 2;
+            this.textBox1.Text = "0";
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // textBox2
             // 
@@ -147,6 +163,8 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 21);
             this.textBox2.TabIndex = 2;
+            this.textBox2.Text = "0";
+            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             // 
             // textBox3
             // 
@@ -154,6 +172,8 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(100, 21);
             this.textBox3.TabIndex = 2;
+            this.textBox3.Text = "8";
+            this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             // 
             // BntRunAuto
             // 
@@ -192,21 +212,27 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "温度调整次数：";
             // 
-            // FlucShow
+            // statusStrip1
             // 
-            this.FlucShow.BackColor = System.Drawing.Color.Red;
-            this.FlucShow.Location = new System.Drawing.Point(6, 34);
-            this.FlucShow.Name = "FlucShow";
-            this.FlucShow.Size = new System.Drawing.Size(40, 40);
-            this.FlucShow.TabIndex = 5;
-            this.FlucShow.TabStop = false;
-            this.FlucShow.Paint += new System.Windows.Forms.PaintEventHandler(this.FlucShow_Paint);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StaCom});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 279);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(336, 22);
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // StaCom
+            // 
+            this.StaCom.Name = "StaCom";
+            this.StaCom.Size = new System.Drawing.Size(0, 17);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(336, 290);
+            this.ClientSize = new System.Drawing.Size(336, 301);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -225,6 +251,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FlucShow)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -234,7 +262,7 @@
 
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem MenuSetting;
-        private System.Windows.Forms.ToolStripMenuItem 串口设置ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MenuComSet;
         private System.Windows.Forms.ToolStripMenuItem 参数设置ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 显示ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 曲线图ToolStripMenuItem;
@@ -250,6 +278,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox FlucShow;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel StaCom;
     }
 }
 

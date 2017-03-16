@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO.Ports;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ConductTempControl_ForPC
 {
@@ -96,9 +97,35 @@ namespace ConductTempControl_ForPC
         /// <param name="portName">Port name of serial port</param>
         public void SetPort(string portName)
         {
-            this.sp.PortName = portName;
-            // Keep the GlobalVars.portName is always the latest.
-            GlbVars.portName = portName;
+            string[] portNames = SerialPort.GetPortNames();
+            
+            if (portNames.Contains(portName.ToUpper()))
+            {
+                this.sp.PortName = portName;
+                // Keep the GlobalVars.portName is always the latest.
+                GlbVars.portName = portName;
+            }
+            else if(portNames.Length != 0)
+            {
+                this.sp.PortName = portNames[0];
+                // Keep the GlobalVars.portName is always the latest.
+                GlbVars.portName = portNames[0];
+            }
+            else
+            {
+                MessageBox.Show("未检测到有效串口，请手动选择");
+                Form ChooseCom = new ComSet();
+                ChooseCom.ShowDialog();
+                if (ChooseCom.DialogResult == DialogResult.OK)
+                    this.sp.PortName = GlbVars.portName;
+                else
+                {
+                    GlbVars.portName = this.sp.PortName;
+                    MessageBox.Show("串口选择未成功，请检查连接并重启软件");
+                }
+
+                ChooseCom.Dispose();
+            }
         }
 
         /// <summary>

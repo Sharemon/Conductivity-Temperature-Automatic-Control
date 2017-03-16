@@ -14,7 +14,7 @@ namespace ConductTempControl_ForPC
     /// </summary>
     public partial class MainForm : Form
     {
-
+        StepControl autoStep;
 
         public MainForm()
         {
@@ -28,9 +28,9 @@ namespace ConductTempControl_ForPC
         {
             // Todo: The first thing is to initialize uartCom.portName
             // Todo: The second thing is to read FlucThr and TempThr from .ini file
-            //Todo: Create dirs at the beginning of Main Form
             //GlobalVars.InitGlobalVars();
-            GlbVars.uartCom = new UartProtocol("COM1");
+            GlbVars.uartCom = new UartProtocol("com9");
+            this.StaCom.Text = GlbVars.portName;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -135,6 +135,62 @@ namespace ConductTempControl_ForPC
         private void BntRunAuto_Click(object sender, EventArgs e)
         {
 
+        }
+
+        #region Txt Parse
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            float noUse = 0;
+
+            if (txt.Text != "-" && txt.Text != "+" /*&& txt.Text != "."*/ && txt.Text != "" &&
+                !float.TryParse(txt.Text, out noUse))
+            {
+                txt.Text = txt.Text.Remove(txt.Text.Length - 1, 1);
+                txt.Select(txt.Text.Length, 0);
+            }
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            float noUse = 0;
+
+            if (txt.Text != "-" && txt.Text != "+" /*&& txt.Text != "."*/ && txt.Text != "" &&
+                !float.TryParse(txt.Text, out noUse))
+            {
+                txt.Text = txt.Text.Remove(txt.Text.Length - 1, 1);
+                txt.Select(txt.Text.Length, 0);
+            }
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            TextBox txt = sender as TextBox;
+            int noUse = 0;
+
+            if (txt.Text != "+" && txt.Text != "" &&
+                !int.TryParse(txt.Text, out noUse))
+            {
+                txt.Text = txt.Text.Remove(txt.Text.Length - 1, 1);
+                txt.Select(txt.Text.Length, 0);
+            }
+        }
+        #endregion
+
+        private void MenuComSet_Click(object sender, EventArgs e)
+        {
+            Form ChooseCom = new ComSet();
+            ChooseCom.ShowDialog();
+            if (ChooseCom.DialogResult == DialogResult.OK)
+                GlbVars.uartCom.SetPort(GlbVars.portName);
+            else
+            {
+                MessageBox.Show("串口选择未成功，请检查连接并重启软件");
+            }
+
+            ChooseCom.Dispose();
+            this.StaCom.Text = GlbVars.portName;
         }
     }
 }

@@ -80,7 +80,7 @@ namespace ConductTempControl_ForPC
         private void BntRead_Click(object sender, EventArgs e)
         {
             // Enter non-timer region to avoid uart conflict
-            GlbVars.tempReadTimer.Enabled = false;
+            GlbVars.EnterNoTimerRegion();
 
             GlbVars.paraValues = readParas();
 
@@ -90,13 +90,13 @@ namespace ConductTempControl_ForPC
             }
 
             // Exit non-timer region
-            GlbVars.tempReadTimer.Enabled = true;
+            GlbVars.ExitNoTimerRegion();
         }
 
         private void BntUpdate_Click(object sender, EventArgs e)
         {
             // Enter non-timer region to avoid uart conflict
-            GlbVars.tempReadTimer.Enabled = false;
+            GlbVars.EnterNoTimerRegion();
 
             bool noError = true;
 
@@ -142,7 +142,7 @@ namespace ConductTempControl_ForPC
             Data2File.Operation2File(false);
 
             // Exit non-timer region
-            GlbVars.tempReadTimer.Enabled = true;
+            GlbVars.ExitNoTimerRegion();
         }
         
         /// <summary>

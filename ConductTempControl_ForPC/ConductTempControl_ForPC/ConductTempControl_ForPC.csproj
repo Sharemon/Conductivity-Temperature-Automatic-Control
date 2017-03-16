@@ -101,6 +101,12 @@
     <Compile Include="AutoControl.Designer.cs">
       <DependentUpon>AutoControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ComSet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ComSet.Designer.cs">
+      <DependentUpon>ComSet.cs</DependentUpon>
+    </Compile>
     <Compile Include="Data2File.cs" />
     <Compile Include="DrawChart.cs" />
     <Compile Include="GlbVars.cs" />
@@ -138,6 +144,9 @@
       <DependentUpon>TemperatureChart.cs</DependentUpon>
     </Compile>
     <Compile Include="UartProtocol.cs" />
+    <EmbeddedResource Include="ComSet.resx">
+      <DependentUpon>ComSet.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LogShow.resx">
       <DependentUpon>LogShow.cs</DependentUpon>
     </EmbeddedResource>
