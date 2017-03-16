@@ -32,6 +32,7 @@ namespace ConductTempControl_ForPC
 
         #region Members -- global variables
         private static bool tempReadTimerEnable = false;
+        // The timer is re-used by auto mode and manual mode, try to avoid conflict
         public static Timer tempReadTimer = new Timer();
 
         public static DateTime ctrlStartTime;

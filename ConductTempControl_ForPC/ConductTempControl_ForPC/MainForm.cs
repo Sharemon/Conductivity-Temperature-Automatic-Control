@@ -1,4 +1,8 @@
-﻿using System;
+﻿//Undone: form show of every menu
+//Undone: Test the auto control functino
+//Undone: .ini file read/wire & initial configuration
+//Undone: write temperature and power into data file
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -29,7 +33,7 @@ namespace ConductTempControl_ForPC
             // Todo: The first thing is to initialize uartCom.portName
             // Todo: The second thing is to read FlucThr and TempThr from .ini file
             //GlobalVars.InitGlobalVars();
-            GlbVars.uartCom = new UartProtocol("com9");
+            GlbVars.uartCom = new UartProtocol("detect");
             this.StaCom.Text = GlbVars.portName;
         }
 
@@ -53,67 +57,17 @@ namespace ConductTempControl_ForPC
             }
         }
 
-        private void timer1_tick(object sender, EventArgs e)
-        {
-            float data = 0;
-            GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempShow, out data);
-            GlbVars.AddTemperature(data);
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            GlbVars.ctrlStartTime = DateTime.Now;
-
-            System.Timers.Timer t1 = GlbVars.tempReadTimer;
-            t1.Interval = GlbVars.readTempInterval;
-            t1.Elapsed += timer1_tick;
-            t1.Enabled = true;
-
-            bool formExist = false;
-            foreach (Form fm in Application.OpenForms)
-            {
-                if (fm.Name == "TemperatureChart")
-                {
-                    fm.BringToFront();
-                    formExist = true;
-                }
-            }
-            if (!formExist)
-            {
-                TemperatureChart fm = new TemperatureChart();
-                fm.Show();
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            bool formExist = false;
-            foreach (Form fm in Application.OpenForms)
-            {
-                if (fm.Name == "LogShow")
-                {
-                    fm.BringToFront();
-                    formExist = true;
-                }
-            }
-            if (!formExist)
-            {
-                LogShow fm = new LogShow();
-                fm.Show();
-            }
-        }
+      
 
         /// <summary>
         /// Redraw picture box to circle shape
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void FlucShow_Paint(object sender, PaintEventArgs e)
         {
             System.Drawing.Drawing2D.GraphicsPath buttonPath =
                 new System.Drawing.Drawing2D.GraphicsPath();
 
-            System.Drawing.Rectangle newRectangle = FlucShow.ClientRectangle;
+            System.Drawing.Rectangle newRectangle = PicFlucShow.ClientRectangle;
 
             // Decrease the size of the rectangle.
             newRectangle.Inflate(-10, -10);
@@ -129,16 +83,103 @@ namespace ConductTempControl_ForPC
 
             // Set the button's Region property to the newly created 
             // circle region.
-            FlucShow.Region = new System.Drawing.Region(buttonPath);
+            PicFlucShow.Region = new System.Drawing.Region(buttonPath);
         }
 
         private void BntRunAuto_Click(object sender, EventArgs e)
         {
+            // Disable auto run button to avoid run repeatedly
+            this.BntRunAuto.Enabled = false;
 
+            // Disable manual menu to avoid 
+            this.MenuManual.Enabled = false;
+
+            // Init auto control
+            float initTemp = float.Parse(TxtInitTemp.Text);
+            float intervalTemp = float.Parse(TxtIntervalTemp.Text);
+            autoStep = new StepControl(initTemp, intervalTemp, intervalTemp > 0);
+
+            // Init check timer
+            System.Timers.Timer checkTimer = GlbVars.tempReadTimer;
+            checkTimer.Interval = GlbVars.readTempInterval;
+            checkTimer.Elapsed += CheckTimer_Tick;
+
+            // Init blink timer
+            System.Timers.Timer blinkTimer = new System.Timers.Timer();
+            blinkTimer.Interval = 500;
+            blinkTimer.Elapsed += BlinkTimer_Elapsed;
+
+            // Record the start time
+            GlbVars.ctrlStartTime = DateTime.Now;
+            // Run
+            blinkTimer.Enabled = true;
+            autoStep.ThisTurn();
+            checkTimer.Enabled = true;
+        }
+
+        /// <summary>
+        /// Timer to blink PicFlucShow to show the system is working
+        /// </summary>
+        private void BlinkTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            this.PicFlucShow.Visible = !this.PicFlucShow.Visible;
+        }
+
+        /// <summary>
+        /// Timer to check if this turn of run is over
+        /// </summary>
+        private void CheckTimer_Tick(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            float temperature = 0;
+            bool steady = autoStep.CheckFluc(out temperature);
+
+            // Update UI
+            this.Invoke(new EventHandler(delegate
+            {
+                // Update temperature show
+                this.LblTempShowAuto.Text = temperature.ToString("0.000");
+
+                // Update fluc flag 
+                if (steady)
+                    this.PicFlucShow.BackColor = Color.Green;
+                else
+                    this.PicFlucShow.BackColor = Color.Red;
+            }));
+
+            // If steady, inform conductivity measurement equipment
+            if (steady)
+            {
+                autoStep.InformCondMeas();
+                int remainTimes = int.Parse(TxtTimes.Text);
+
+                // Remain times dcrease 1
+                remainTimes--;
+                this.Invoke(new EventHandler(delegate
+                {
+                    this.TxtTimes.Text = remainTimes.ToString();
+                }));
+
+                // If there no remain times, finish all test
+                if (remainTimes == 0)
+                {
+                    GlbVars.tempReadTimer.Enabled = false;
+                    MessageBox.Show("所有测试结束");
+
+                    this.Invoke(new EventHandler(delegate
+                    {
+                        this.BntRunAuto.Enabled = true;
+                    }));
+                }
+                // If there is, start next turn of run
+                else
+                {
+                    autoStep.NextTurn();
+                }
+            }
         }
 
         #region Txt Parse
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void TxtInitTemp_TextChanged(object sender, EventArgs e)
         {
             TextBox txt = sender as TextBox;
             float noUse = 0;
@@ -151,7 +192,7 @@ namespace ConductTempControl_ForPC
             }
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        private void TxtIntervalTemp_TextChanged(object sender, EventArgs e)
         {
             TextBox txt = sender as TextBox;
             float noUse = 0;
@@ -164,13 +205,13 @@ namespace ConductTempControl_ForPC
             }
         }
 
-        private void textBox3_TextChanged(object sender, EventArgs e)
+        private void TxtTimes_TextChanged(object sender, EventArgs e)
         {
             TextBox txt = sender as TextBox;
             int noUse = 0;
 
             if (txt.Text != "+" && txt.Text != "" &&
-                !int.TryParse(txt.Text, out noUse))
+                !int.TryParse(txt.Text, out noUse) && (int.Parse(txt.Text) > 0))
             {
                 txt.Text = txt.Text.Remove(txt.Text.Length - 1, 1);
                 txt.Select(txt.Text.Length, 0);

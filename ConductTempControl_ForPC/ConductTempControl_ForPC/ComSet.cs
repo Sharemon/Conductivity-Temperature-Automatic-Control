@@ -57,6 +57,7 @@ namespace ConductTempControl_ForPC
 
         private void ComSet_FormClosing(object sender, FormClosingEventArgs e)
         {
+            //Todo: Test if there is any bug when directly close the form
             this.DialogResult = DialogResult.Cancel;
         }
     }

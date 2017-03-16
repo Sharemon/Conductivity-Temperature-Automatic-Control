@@ -19,6 +19,8 @@ namespace ConductTempControl_ForPC
         //private float tempSetLast     = 0;
         private bool tempSetOrient    = true;      // True for +, false for -
 
+        private int checkCount = 0;
+        // Replaced by GlbVars.uartCom
         //private UartProtocol uartCom = new UartProtocol(GlobalVars.portName);
         #endregion
 
@@ -47,6 +49,10 @@ namespace ConductTempControl_ForPC
         /// </summary>
         public void NextTurn()
         {
+            // Clear counter
+            this.checkCount = 0;
+
+            // Calculate next temperature target value
             if (this.tempSetOrient)
             {
                 this.tempSetCurrent = tempSetCurrent + tempSetInterval;
@@ -57,6 +63,7 @@ namespace ConductTempControl_ForPC
             }
 
             // Improve: Need remove all uart error judgement?
+            // Set temperature target
             if (GlbVars.uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
                 != UartProtocol.Errors_t.NoError)
             {
@@ -79,7 +86,11 @@ namespace ConductTempControl_ForPC
         /// </summary>
         public void ThisTurn()
         {
+            // Clear counter
+            this.checkCount = 0;
+
             // Improve: Need remove all uart error judgement?
+            // Set temperature target
             if (GlbVars.uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
                 != UartProtocol.Errors_t.NoError)
             {
@@ -109,28 +120,32 @@ namespace ConductTempControl_ForPC
         /// </summary>
         /// <param name="count">Count used to calculate fluctuation</param>
         /// <returns>If in range</returns>
-        public bool CheckFluc(int count)
+        public bool CheckFluc(out float temperature)
         {
-            float tempareture = 0;
+            // Increase counter
+            this.checkCount++;
 
             // Improve: Need remove all uart error judgement?
-            if (GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempSet, out tempareture)
+            if (GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempSet, out temperature)
                 != UartProtocol.Errors_t.NoError)
             {
                 Exception e = new Exception(" Communication command is in error !!!");
                 throw e;
             }
 
+            // Add temperature data into list
+            GlbVars.AddTemperature(temperature);
+
             float fluctuation = 0;
 
             // If there not enough temperature point to check fluctuation, consider it not in range
-            if ( !GlbVars.GetFluc(count, out fluctuation))
+            if ( !GlbVars.GetFluc(checkCount, out fluctuation))
             {
                 return false;
             }
 
             // If temperature and fluctuation are both in range, return true
-            if (Math.Abs(tempareture - this.tempSetCurrent) < GlbVars.paraValues[(int)GlbVars.Paras_t.TempThr] ||
+            if (Math.Abs(temperature - this.tempSetCurrent) < GlbVars.paraValues[(int)GlbVars.Paras_t.TempThr] ||
                 fluctuation < GlbVars.paraValues[(int)GlbVars.Paras_t.FlucThr])
             {
                 return true;
@@ -143,7 +158,7 @@ namespace ConductTempControl_ForPC
         /// Inform conduct equipment to start to measure
         /// </summary>
         /// <returns>If conduct measurement is over</returns>
-        public bool InformConduct()
+        public bool InformCondMeas()
         {
             // Now we don't have any interface with conduct measurement
             // So just delay for 2 minutes
