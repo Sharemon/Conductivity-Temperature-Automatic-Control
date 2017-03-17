@@ -135,6 +135,9 @@ namespace ConductTempControl_ForPC
         /// <param name="value">Value of Command</param>
         public Errors_t SendData(Commands_t commandName, float value)
         {
+            // To avoid conflict
+            CheckSP();
+
             // Improve: Check if can remove this and commandRW when development finishes.
             // If the command cannot be write, throw an exception
             if (cmdRW[(int)commandName] != "w")
@@ -156,6 +159,7 @@ namespace ConductTempControl_ForPC
             return error;
         }
 
+
         /// <summary>
         /// Read data from MCU
         /// </summary>
@@ -164,6 +168,9 @@ namespace ConductTempControl_ForPC
         /// <returns></returns>
         public Errors_t ReadData(Commands_t commandName, out float readValue)
         {
+            // To avoid conflict
+            CheckSP();
+
             // All command can be read
             string command = ConstructCommand(commandName, 0.0f, false);
 
@@ -191,6 +198,14 @@ namespace ConductTempControl_ForPC
         #endregion
 
         #region Private Methods
+        /// <summary>
+        /// Check if sp is open, if so, close it.
+        /// </summary>
+        private void CheckSP()
+        {
+            this.sp.Close();
+        }
+
         /// <summary>
         /// Determine i there is any error in communication
         /// </summary>

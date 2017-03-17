@@ -31,12 +31,11 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.MenuSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuComSet = new System.Windows.Forms.ToolStripMenuItem();
-            this.参数设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuParaSet = new System.Windows.Forms.ToolStripMenuItem();
             this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuManual = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuChart = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuOperation = new System.Windows.Forms.ToolStripMenuItem();
-            this.LblTempShowAuto = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.PicFlucShow = new System.Windows.Forms.PictureBox();
             this.TxtInitTemp = new System.Windows.Forms.TextBox();
@@ -48,6 +47,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.StaCom = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LblTempShowAuto = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PicFlucShow)).BeginInit();
@@ -69,7 +69,7 @@
             // 
             this.MenuSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuComSet,
-            this.参数设置ToolStripMenuItem});
+            this.MenuParaSet});
             this.MenuSetting.Name = "MenuSetting";
             this.MenuSetting.Size = new System.Drawing.Size(44, 21);
             this.MenuSetting.Text = "设置";
@@ -81,11 +81,12 @@
             this.MenuComSet.Text = "串口设置";
             this.MenuComSet.Click += new System.EventHandler(this.MenuComSet_Click);
             // 
-            // 参数设置ToolStripMenuItem
+            // MenuParaSet
             // 
-            this.参数设置ToolStripMenuItem.Name = "参数设置ToolStripMenuItem";
-            this.参数设置ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
-            this.参数设置ToolStripMenuItem.Text = "参数设置";
+            this.MenuParaSet.Name = "MenuParaSet";
+            this.MenuParaSet.Size = new System.Drawing.Size(124, 22);
+            this.MenuParaSet.Text = "参数设置";
+            this.MenuParaSet.Click += new System.EventHandler(this.MenuParaSet_Click);
             // 
             // 显示ToolStripMenuItem
             // 
@@ -102,38 +103,29 @@
             this.MenuManual.Name = "MenuManual";
             this.MenuManual.Size = new System.Drawing.Size(124, 22);
             this.MenuManual.Text = "手动操作";
+            this.MenuManual.Click += new System.EventHandler(this.MenuManual_Click);
             // 
             // MenuChart
             // 
             this.MenuChart.Name = "MenuChart";
             this.MenuChart.Size = new System.Drawing.Size(124, 22);
             this.MenuChart.Text = "曲线图";
+            this.MenuChart.Click += new System.EventHandler(this.MenuChart_Click);
             // 
             // MenuOperation
             // 
             this.MenuOperation.Name = "MenuOperation";
             this.MenuOperation.Size = new System.Drawing.Size(124, 22);
             this.MenuOperation.Text = "操作日志";
-            // 
-            // LblTempShowAuto
-            // 
-            this.LblTempShowAuto.AutoSize = true;
-            this.LblTempShowAuto.Dock = System.Windows.Forms.DockStyle.Right;
-            this.LblTempShowAuto.Font = new System.Drawing.Font("Microsoft YaHei", 42F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblTempShowAuto.ForeColor = System.Drawing.Color.Red;
-            this.LblTempShowAuto.Location = new System.Drawing.Point(59, 17);
-            this.LblTempShowAuto.Name = "LblTempShowAuto";
-            this.LblTempShowAuto.Size = new System.Drawing.Size(250, 75);
-            this.LblTempShowAuto.TabIndex = 0;
-            this.LblTempShowAuto.Text = "0.000 ℃";
+            this.MenuOperation.Click += new System.EventHandler(this.MenuOperation_Click);
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.PicFlucShow);
             this.groupBox1.Controls.Add(this.LblTempShowAuto);
+            this.groupBox1.Controls.Add(this.PicFlucShow);
             this.groupBox1.Location = new System.Drawing.Point(12, 40);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(312, 100);
+            this.groupBox1.Size = new System.Drawing.Size(312, 89);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "当前温度显示";
@@ -141,7 +133,7 @@
             // PicFlucShow
             // 
             this.PicFlucShow.BackColor = System.Drawing.Color.Red;
-            this.PicFlucShow.Location = new System.Drawing.Point(6, 34);
+            this.PicFlucShow.Location = new System.Drawing.Point(16, 30);
             this.PicFlucShow.Name = "PicFlucShow";
             this.PicFlucShow.Size = new System.Drawing.Size(40, 40);
             this.PicFlucShow.TabIndex = 5;
@@ -154,7 +146,7 @@
             this.TxtInitTemp.Name = "TxtInitTemp";
             this.TxtInitTemp.Size = new System.Drawing.Size(100, 21);
             this.TxtInitTemp.TabIndex = 2;
-            this.TxtInitTemp.Text = "0";
+            this.TxtInitTemp.Text = "25";
             this.TxtInitTemp.TextChanged += new System.EventHandler(this.TxtInitTemp_TextChanged);
             // 
             // TxtIntervalTemp
@@ -163,7 +155,7 @@
             this.TxtIntervalTemp.Name = "TxtIntervalTemp";
             this.TxtIntervalTemp.Size = new System.Drawing.Size(100, 21);
             this.TxtIntervalTemp.TabIndex = 2;
-            this.TxtIntervalTemp.Text = "0";
+            this.TxtIntervalTemp.Text = "2";
             this.TxtIntervalTemp.TextChanged += new System.EventHandler(this.TxtIntervalTemp_TextChanged);
             // 
             // TxtTimes
@@ -227,6 +219,20 @@
             this.StaCom.Name = "StaCom";
             this.StaCom.Size = new System.Drawing.Size(0, 17);
             // 
+            // LblTempShowAuto
+            // 
+            this.LblTempShowAuto.BackColor = System.Drawing.SystemColors.Control;
+            this.LblTempShowAuto.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.LblTempShowAuto.Font = new System.Drawing.Font("Microsoft YaHei", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblTempShowAuto.ForeColor = System.Drawing.Color.Red;
+            this.LblTempShowAuto.Location = new System.Drawing.Point(78, 17);
+            this.LblTempShowAuto.Name = "LblTempShowAuto";
+            this.LblTempShowAuto.Size = new System.Drawing.Size(222, 64);
+            this.LblTempShowAuto.TabIndex = 6;
+            this.LblTempShowAuto.TabStop = false;
+            this.LblTempShowAuto.Text = "0.000 ℃";
+            this.LblTempShowAuto.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -263,12 +269,11 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem MenuSetting;
         private System.Windows.Forms.ToolStripMenuItem MenuComSet;
-        private System.Windows.Forms.ToolStripMenuItem 参数设置ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MenuParaSet;
         private System.Windows.Forms.ToolStripMenuItem 显示ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem MenuManual;
         private System.Windows.Forms.ToolStripMenuItem MenuChart;
         private System.Windows.Forms.ToolStripMenuItem MenuOperation;
-        private System.Windows.Forms.Label LblTempShowAuto;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox TxtInitTemp;
         private System.Windows.Forms.TextBox TxtIntervalTemp;
@@ -280,6 +285,7 @@
         private System.Windows.Forms.PictureBox PicFlucShow;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel StaCom;
+        private System.Windows.Forms.TextBox LblTempShowAuto;
     }
 }
 

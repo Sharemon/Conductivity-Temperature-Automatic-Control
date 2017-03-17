@@ -1,7 +1,4 @@
-﻿//Undone: form show of every menu
-//Undone: Test the auto control functino
-//Undone: .ini file read/wire & initial configuration
-//Undone: write temperature and power into data file
+﻿//Undone: write temperature and power into data file
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ConductTempControl_ForPC
 {
@@ -18,43 +16,56 @@ namespace ConductTempControl_ForPC
     /// </summary>
     public partial class MainForm : Form
     {
-        StepControl autoStep;
+        private StepControl autoStep;
+        private bool runOrStop = true;      // Indicate the function of RUN button
+        System.Timers.Timer blinkTimer = new System.Timers.Timer();
+        private const string configFilePath = @"./config.ini";
+        private const string configSec = "CONFIG";
 
         public MainForm()
         {
             InitializeComponent();
-
-            // Check and create folders for data saving
-            Data2File.CheckDirs();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            // Todo: The first thing is to initialize uartCom.portName
-            // Todo: The second thing is to read FlucThr and TempThr from .ini file
-            //GlobalVars.InitGlobalVars();
-            GlbVars.uartCom = new UartProtocol("detect");
+            // Check and create folders for data saving
+            Data2File.CheckDirs();
+
+            #region Load configuration .ini file
+            // If there is no config file, create one and write default value to it
+            if (!File.Exists(configFilePath))
+            {
+                IniReadWrite.INIWriteValue(configFilePath, configSec, "COM", "COM1");
+                IniReadWrite.INIWriteValue(configFilePath, configSec, "TempThr", "0.01");
+                IniReadWrite.INIWriteValue(configFilePath, configSec, "FlucThr", "0.01");
+                IniReadWrite.INIWriteValue(configFilePath, configSec, "ReadInterval", "1000");
+            }
+
+            // Get COM port and set it
+            GlbVars.uartCom = 
+                new UartProtocol(IniReadWrite.INIGetStringValue(configFilePath, configSec, "COM", "COM1"));
             this.StaCom.Text = GlbVars.portName;
-        }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //GlobalVars.AddTemperature(0.0f);
+            // Get temperature and fluctuation threshold
+            GlbVars.paraValues[(int)GlbVars.Paras_t.TempThr] =
+                float.Parse(IniReadWrite.INIGetStringValue(configFilePath, configSec, "TempThr", "0.01"));
 
-            bool formExist = false;
-            foreach(Form fm in Application.OpenForms)
-            {
-                if (fm.Name == "ParameterSet")
-                {
-                    fm.BringToFront();
-                    formExist = true;
-                }
-            }
-            if (!formExist)
-            {
-                ParameterSet fm = new ParameterSet();
-                fm.Show();
-            }
+            GlbVars.paraValues[(int)GlbVars.Paras_t.FlucThr] =
+                float.Parse(IniReadWrite.INIGetStringValue(configFilePath, configSec, "FlucThr", "0.01"));
+
+            // Get read timer.interval
+            GlbVars.readTempInterval =
+                int.Parse(IniReadWrite.INIGetStringValue(configFilePath, configSec, "ReadInterval", "1000"));
+            #endregion
+
+            // Init check timer, use readTempTimer to replace
+            GlbVars.tempReadTimer.Interval = GlbVars.readTempInterval;
+            GlbVars.tempReadTimer.Elapsed += CheckTimer_Tick;
+
+            // Init blink timer
+            blinkTimer.Interval = 1000;
+            blinkTimer.Elapsed += BlinkTimer_Elapsed;
         }
 
       
@@ -88,33 +99,52 @@ namespace ConductTempControl_ForPC
 
         private void BntRunAuto_Click(object sender, EventArgs e)
         {
-            // Disable auto run button to avoid run repeatedly
-            this.BntRunAuto.Enabled = false;
+            // runOrStop, true for run, false for stop
+            if (runOrStop)
+            {
+                // Change the button to Stop function
+                this.BntRunAuto.Text = "终止";
 
-            // Disable manual menu to avoid 
-            this.MenuManual.Enabled = false;
+                // Disable manual menu to avoid 
+                this.MenuManual.Enabled = false;
+                this.MenuParaSet.Enabled = false;
+                this.MenuComSet.Enabled = false;
 
-            // Init auto control
-            float initTemp = float.Parse(TxtInitTemp.Text);
-            float intervalTemp = float.Parse(TxtIntervalTemp.Text);
-            autoStep = new StepControl(initTemp, intervalTemp, intervalTemp > 0);
+                // Init auto control
+                float initTemp = float.Parse(TxtInitTemp.Text);
+                float intervalTemp = float.Parse(TxtIntervalTemp.Text);
+                autoStep = new StepControl(initTemp, intervalTemp, intervalTemp > 0);
 
-            // Init check timer
-            System.Timers.Timer checkTimer = GlbVars.tempReadTimer;
-            checkTimer.Interval = GlbVars.readTempInterval;
-            checkTimer.Elapsed += CheckTimer_Tick;
+                // Record the start time
+                GlbVars.ctrlStartTime = DateTime.Now;
+                // Run
+                blinkTimer.Enabled = true;
+                autoStep.ThisTurn();
+                GlbVars.tempReadTimer.Enabled = true;
+            }
+            else
+            {
+                // Change the button to Stop function
+                this.BntRunAuto.Text = "运行";
 
-            // Init blink timer
-            System.Timers.Timer blinkTimer = new System.Timers.Timer();
-            blinkTimer.Interval = 500;
-            blinkTimer.Elapsed += BlinkTimer_Elapsed;
+                // Enable all menus
+                this.MenuManual.Enabled = true;
+                this.MenuParaSet.Enabled = true;
+                this.MenuComSet.Enabled = true;
 
-            // Record the start time
-            GlbVars.ctrlStartTime = DateTime.Now;
-            // Run
-            blinkTimer.Enabled = true;
-            autoStep.ThisTurn();
-            checkTimer.Enabled = true;
+                // Stop timer
+                GlbVars.tempReadTimer.Enabled = false;
+                blinkTimer.Enabled = false;
+
+                // Fix flucShow to read and show
+                PicFlucShow.BackColor = Color.Red;
+                PicFlucShow.Visible = true;
+
+                // Finish the temperature data file
+                Data2File.FinishTempFile();
+            }
+
+            runOrStop = !runOrStop;
         }
 
         /// <summary>
@@ -122,7 +152,10 @@ namespace ConductTempControl_ForPC
         /// </summary>
         private void BlinkTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            this.PicFlucShow.Visible = !this.PicFlucShow.Visible;
+            this.Invoke(new EventHandler(delegate
+            {
+                this.PicFlucShow.Visible = !this.PicFlucShow.Visible;
+            }));
         }
 
         /// <summary>
@@ -137,7 +170,9 @@ namespace ConductTempControl_ForPC
             this.Invoke(new EventHandler(delegate
             {
                 // Update temperature show
-                this.LblTempShowAuto.Text = temperature.ToString("0.000");
+                this.LblTempShowAuto.Text = temperature.ToString("0.000 ℃");
+                // Save temperature data
+                Data2File.Temp2File(temperature);
 
                 // Update fluc flag 
                 if (steady)
@@ -149,7 +184,11 @@ namespace ConductTempControl_ForPC
             // If steady, inform conductivity measurement equipment
             if (steady)
             {
+                // Create a critical region
+                GlbVars.tempReadTimer.Enabled = false;
                 autoStep.InformCondMeas();
+                GlbVars.tempReadTimer.Enabled = true;
+
                 int remainTimes = int.Parse(TxtTimes.Text);
 
                 // Remain times dcrease 1
@@ -162,12 +201,17 @@ namespace ConductTempControl_ForPC
                 // If there no remain times, finish all test
                 if (remainTimes == 0)
                 {
+                    // Game over
                     GlbVars.tempReadTimer.Enabled = false;
                     MessageBox.Show("所有测试结束");
 
+                    // Finish the temperature data file
+                    Data2File.FinishTempFile();
+
+                    // Click Run button to change the status to STOP status
                     this.Invoke(new EventHandler(delegate
                     {
-                        this.BntRunAuto.Enabled = true;
+                        this.BntRunAuto.PerformClick();
                     }));
                 }
                 // If there is, start next turn of run
@@ -221,6 +265,7 @@ namespace ConductTempControl_ForPC
 
         private void MenuComSet_Click(object sender, EventArgs e)
         {
+            // Comset form will be topmost, do not need to check
             Form ChooseCom = new ComSet();
             ChooseCom.ShowDialog();
             if (ChooseCom.DialogResult == DialogResult.OK)
@@ -232,6 +277,82 @@ namespace ConductTempControl_ForPC
 
             ChooseCom.Dispose();
             this.StaCom.Text = GlbVars.portName;
+        }
+
+        private void MenuParaSet_Click(object sender, EventArgs e)
+        {
+            // Check if there is hidden form with same name
+            // If so, bring it to the front. If not, show a new one
+            bool formExist = false;
+            foreach (Form fm in Application.OpenForms)
+            {
+                if (fm.Name == "ParameterSet")
+                {
+                    // Avoid form being minimized
+                    fm.WindowState = FormWindowState.Normal;
+
+                    fm.BringToFront();
+                    formExist = true;
+                }
+            }
+            if (!formExist)
+            {
+                Form fm = new ParameterSet();
+                fm.Show();
+            }
+        }
+
+        private void MenuManual_Click(object sender, EventArgs e)
+        {
+            // Comset form will be topmost, do not need to check
+            Form fm = new ManualControl();
+            fm.Show();
+        }
+
+        private void MenuChart_Click(object sender, EventArgs e)
+        {
+            // Check if there is hidden form with same name
+            // If so, bring it to the front. If not, show a new one
+            bool formExist = false;
+            foreach (Form fm in Application.OpenForms)
+            {
+                if (fm.Name == "TemperatureChart")
+                {
+                    // Avoid form being minimized
+                    fm.WindowState = FormWindowState.Normal;
+
+                    fm.BringToFront();
+                    formExist = true;
+                }
+            }
+            if (!formExist)
+            {
+                Form fm = new TemperatureChart();
+                fm.Show();
+            }
+        }
+
+        private void MenuOperation_Click(object sender, EventArgs e)
+        {
+            // Check if there is hidden form with same name
+            // If so, bring it to the front. If not, show a new one
+            bool formExist = false;
+            foreach (Form fm in Application.OpenForms)
+            {
+                if (fm.Name == "LogShow")
+                {
+                    // Avoid form being minimized
+                    fm.WindowState = FormWindowState.Normal;
+
+                    fm.BringToFront();
+                    formExist = true;
+                }
+            }
+            if (!formExist)
+            {
+                Form fm = new LogShow();
+                fm.Show();
+            }
         }
     }
 }

@@ -92,7 +92,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Name = "LogShow";
-            this.Text = "LogShow";
+            this.Text = "操作日志";
             this.Load += new System.EventHandler(this.LogShow_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);

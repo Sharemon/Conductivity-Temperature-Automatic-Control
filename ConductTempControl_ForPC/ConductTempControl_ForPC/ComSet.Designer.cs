@@ -83,7 +83,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ComSet";
-            this.Text = "ComSet";
+            this.Text = "串口设置";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ComSet_FormClosing);
             this.Load += new System.EventHandler(this.ComSet_Load);

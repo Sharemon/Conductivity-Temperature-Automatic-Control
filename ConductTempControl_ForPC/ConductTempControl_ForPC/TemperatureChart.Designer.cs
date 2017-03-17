@@ -112,7 +112,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TempPic);
             this.Name = "TemperatureChart";
-            this.Text = "TemperatureChart";
+            this.Text = "温度曲线图";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TemperatureChart_FormClosing);
             this.Load += new System.EventHandler(this.TemperatureChart_Load);
             ((System.ComponentModel.ISupportInitialize)(this.TempPic)).EndInit();

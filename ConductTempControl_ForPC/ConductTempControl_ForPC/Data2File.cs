@@ -20,6 +20,7 @@ namespace ConductTempControl_ForPC
         private static string operFolder   = "";
         private static string tempFilePath = "";
         private static string tempFolder   = "";
+        private static int    tempCount    = 0;
         private static string myDocPath    = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         private const string appName  = "自动控温系统";
@@ -53,7 +54,7 @@ namespace ConductTempControl_ForPC
             tempFolder = myDocPath + "\\" + appName + "\\" + tempName;
         }
 
-
+        #region operation 2 file
         /// <summary>
         /// Add changed para name(enum) to list which can be marked in operation log file
         /// </summary>
@@ -117,6 +118,43 @@ namespace ConductTempControl_ForPC
         {
             return operFolder;
         }
+        #endregion
+
+        #region temperature 2 file
+        /// <summary>
+        /// Force to start another file to save temperature
+        /// </summary>
+        public static void FinishTempFile()
+        {
+            tempCount = 0;
+        }
+
+        /// <summary>
+        /// Save temperature data to file
+        /// </summary>
+        /// <param name="temperature">Temperature need to be recorded</param>
+        public static void Temp2File(float temperature)
+        {
+            // If count = 0, start a new file
+            if (tempCount == 0)
+                tempFilePath = tempFolder + "\\"+ DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".data";
+
+            int countOneDay = 24 * 60 * 60 / (GlbVars.readTempInterval / 1000);
+            if (tempCount < countOneDay)
+            {
+                using (StreamWriter temp = new StreamWriter(tempFilePath, true))
+                {
+                    temp.WriteLine
+                        (DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + "\t" + temperature.ToString("0.000"));
+                }
+            }
+
+            tempCount++;
+            if(tempCount == countOneDay)
+                tempCount = 0;
+        }
+        #endregion
+
         #endregion
     }
 }

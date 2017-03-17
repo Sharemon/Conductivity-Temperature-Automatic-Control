@@ -19,7 +19,9 @@ namespace ConductTempControl_ForPC
         //private float tempSetLast     = 0;
         private bool tempSetOrient    = true;      // True for +, false for -
 
-        private int checkCount = 0;
+        // Init the check count to 1min
+        // Todo: check it should be changed?
+        private int checkCount = 1 * 60 / (GlbVars.readTempInterval/1000);
         // Replaced by GlbVars.uartCom
         //private UartProtocol uartCom = new UartProtocol(GlobalVars.portName);
         #endregion
@@ -49,17 +51,14 @@ namespace ConductTempControl_ForPC
         /// </summary>
         public void NextTurn()
         {
-            // Clear counter
-            this.checkCount = 0;
-
             // Calculate next temperature target value
             if (this.tempSetOrient)
             {
-                this.tempSetCurrent = tempSetCurrent + tempSetInterval;
+                this.tempSetCurrent = this.tempSetCurrent + this.tempSetInterval;
             }
             else
             {
-                this.tempSetCurrent = tempSetCurrent - tempSetInterval;
+                this.tempSetCurrent = this.tempSetCurrent - this.tempSetInterval;
             }
 
             // Improve: Need remove all uart error judgement?
@@ -86,9 +85,6 @@ namespace ConductTempControl_ForPC
         /// </summary>
         public void ThisTurn()
         {
-            // Clear counter
-            this.checkCount = 0;
-
             // Improve: Need remove all uart error judgement?
             // Set temperature target
             if (GlbVars.uartCom.SendData(UartProtocol.Commands_t.TempSet, tempSetCurrent)
@@ -122,11 +118,8 @@ namespace ConductTempControl_ForPC
         /// <returns>If in range</returns>
         public bool CheckFluc(out float temperature)
         {
-            // Increase counter
-            this.checkCount++;
-
             // Improve: Need remove all uart error judgement?
-            if (GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempSet, out temperature)
+            if (GlbVars.uartCom.ReadData(UartProtocol.Commands_t.TempShow, out temperature)
                 != UartProtocol.Errors_t.NoError)
             {
                 Exception e = new Exception(" Communication command is in error !!!");
@@ -145,7 +138,7 @@ namespace ConductTempControl_ForPC
             }
 
             // If temperature and fluctuation are both in range, return true
-            if (Math.Abs(temperature - this.tempSetCurrent) < GlbVars.paraValues[(int)GlbVars.Paras_t.TempThr] ||
+            if (Math.Abs(temperature - this.tempSetCurrent) < GlbVars.paraValues[(int)GlbVars.Paras_t.TempThr] &&
                 fluctuation < GlbVars.paraValues[(int)GlbVars.Paras_t.FlucThr])
             {
                 return true;

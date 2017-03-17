@@ -269,7 +269,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Name = "ParameterSet";
-            this.Text = "ParameterSet";
+            this.Text = "参数设置";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ParameterSet_FormClosing);
             this.Load += new System.EventHandler(this.ParameterSet_Load);
             this.ResumeLayout(false);

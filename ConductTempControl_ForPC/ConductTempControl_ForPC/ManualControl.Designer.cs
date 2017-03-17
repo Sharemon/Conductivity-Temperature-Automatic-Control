@@ -28,9 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // ManualControl
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "ManualControl";
+            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Name = "ManualControl";
+            this.Text = "手动控制界面";
+            this.TopMost = true;
+            this.ResumeLayout(false);
+
         }
 
         #endregion

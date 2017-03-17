@@ -95,12 +95,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoControl.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AutoControl.Designer.cs">
-      <DependentUpon>AutoControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="ComSet.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -110,6 +104,7 @@
     <Compile Include="Data2File.cs" />
     <Compile Include="DrawChart.cs" />
     <Compile Include="GlbVars.cs" />
+    <Compile Include="IniReadWrite.cs" />
     <Compile Include="LogShow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -153,6 +148,9 @@
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ManualControl.resx">
+      <DependentUpon>ManualControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ParameterSet.resx">
       <DependentUpon>ParameterSet.cs</DependentUpon>
     </EmbeddedResource>
@@ -170,7 +168,6 @@
       <DependentUpon>TemperatureChart.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="ConductTempControl_ForPC_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
