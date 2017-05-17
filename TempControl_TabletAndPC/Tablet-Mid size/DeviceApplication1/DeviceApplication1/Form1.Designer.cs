@@ -34,7 +34,6 @@
             this.TempShow = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.timer1 = new System.Windows.Forms.Timer();
             this.PowerShow = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
@@ -49,6 +48,9 @@
             this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.FlashLight = new System.Windows.Forms.PictureBox();
             this.logbnt = new System.Windows.Forms.Button();
+            this.bntLink = new System.Windows.Forms.Button();
+            this.serialPort2 = new System.IO.Ports.SerialPort(this.components);
+            this.timer1 = new System.Windows.Forms.Timer();
             this.SuspendLayout();
             // 
             // checkBox1
@@ -75,10 +77,6 @@
             resources.ApplyResources(this.label1, "label1");
             this.label1.ForeColor = System.Drawing.Color.Purple;
             this.label1.Name = "label1";
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // PowerShow
             // 
@@ -177,6 +175,23 @@
             this.logbnt.Name = "logbnt";
             this.logbnt.Click += new System.EventHandler(this.logbnt_Click);
             // 
+            // bntLink
+            // 
+            this.bntLink.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            resources.ApplyResources(this.bntLink, "bntLink");
+            this.bntLink.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.bntLink.Name = "bntLink";
+            this.bntLink.Click += new System.EventHandler(this.bntLink_Click);
+            // 
+            // serialPort2
+            // 
+            this.serialPort2.BaudRate = 115200;
+            this.serialPort2.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort2_DataReceived);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -192,6 +207,7 @@
             this.Controls.Add(this.logbnt);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
+            this.Controls.Add(this.bntLink);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.TempSet2);
             this.Controls.Add(this.label2);
@@ -211,7 +227,6 @@
         private System.Windows.Forms.TextBox TempShow;
         private System.Windows.Forms.Label label1;
         public System.IO.Ports.SerialPort serialPort1;
-        public System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox PowerShow;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button3;
@@ -226,6 +241,9 @@
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.PictureBox FlashLight;
         public System.Windows.Forms.Button logbnt;
+        private System.Windows.Forms.Button bntLink;
+        private System.IO.Ports.SerialPort serialPort2;
+        public System.Windows.Forms.Timer timer1;
     }
 }
 

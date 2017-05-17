@@ -1,4 +1,4 @@
-#define WATCH_DOG
+#define WATCH_DOG1
 
 using System;
 using System.Collections.Generic;
@@ -56,6 +56,9 @@ namespace DeviceApplication1
         private Form f2;
         private Form f3;
         private Form f4;
+        private bool linkState = false;
+
+        private bool tempbool = false;
 
         public MainForm()
         {
@@ -189,6 +192,7 @@ namespace DeviceApplication1
             {
                 serialPort1.WriteLine("@35RH:\r\n");
                 Thread.Sleep(500);
+                
                 str = serialPort1.ReadTo(":");
                 for (int k = 5; k < str.Length; k++)
                 {
@@ -200,7 +204,7 @@ namespace DeviceApplication1
 
                 //显示温度
                 TempShow.Text = float.Parse(strTemp).ToString("0.000") + " ℃";
-                
+  
                 //每两秒记录一次温度，所以只有当flag=true的时候才记录
                 if (saveTempFlag)
                 {
@@ -210,13 +214,13 @@ namespace DeviceApplication1
                 }
                 //翻转flag
                 saveTempFlag = !saveTempFlag;
-
+                
                 // 处理数组为画图做准备
                 if (temperature.Count > tempNum)         //限制数据个数
                 {
                     temperature.RemoveAt(0);
                 }
-                
+
                 //波动率准备
                 if (temperature2.Count > tempNum2)         //限制数据个数
                 {
@@ -240,6 +244,7 @@ namespace DeviceApplication1
                             Max = temperature2[i];
                         }
                     }
+                    
                     fluctuation = Max - Min;
                     if (fluctuation < flucCrite)
                     {
@@ -261,6 +266,7 @@ namespace DeviceApplication1
                       
                     }
                     stringFluc = fluctuation.ToString("0.000");
+                    
                 }
                 else
                 {
@@ -278,7 +284,7 @@ namespace DeviceApplication1
                 {
                     saveTxt(strTemp, stringFluc);
                 }
-
+                
                 //清一下变量
                 strTemp = "";
             }
@@ -441,6 +447,132 @@ namespace DeviceApplication1
         {
             f3 = new LogForm();
             f3.Show();
+        }
+
+        private void bntLink_Click(object sender, EventArgs e)
+        {
+
+            if (!linkState)     // in unlink mode
+            {
+                // disable all other bunttons
+                button3.Enabled = false;
+                button4.Enabled = false;
+                logbnt.Enabled = false;
+
+                // open serial port
+                serialPort2.PortName = "COM1";
+                serialPort2.ReadTimeout = 2000;
+                serialPort2.Open();
+
+                linkState = true;
+                bntLink.Text = "脱机模式";
+            }
+            else  // in link mode
+            {
+                // re-enable all buttons
+                button3.Enabled = true;
+                button4.Enabled = true;
+                logbnt.Enabled = true;
+
+                // close serial port
+                serialPort2.Close();
+
+                linkState = false;
+                bntLink.Text = "联机模式";
+            }
+            
+        }
+
+        private void serialPort2_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            // read all data
+            string readData = serialPort2.ReadTo("@");
+            serialPort2.DiscardInBuffer();
+
+            if (readData[readData.Length - 1] == '?')     // read parameter
+            {
+                ;
+            }
+            else if (readData[readData.Length - 1] == '!') // set parameters
+            {
+                // disable read timer to avoid conflict
+                this.Invoke(new EventHandler(delegate
+                {
+                    timer1.Enabled = false;
+                }));
+
+                // decode the parameter and set parameter
+                switch (readData.Substring(0, 5))
+                {
+                    case "TMSET":       // temperature setting
+                        string numString = readData.Substring(6, readData.Length - 7);
+                        float value = float.Parse(numString);
+                        serialPort1.WriteLine("@35WA" + value.ToString("0.000") + ":\r");
+                        if (!isError())
+                        {
+                            paraments[0] = value;
+                            TempSet = value;
+                            TempSet2.Text = value.ToString("0.000");
+                        }
+                        else
+                        {
+                            TempSet2.Text = paraments[0].ToString("0.000");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                // clear serialport 1
+                serialPort1.DiscardInBuffer();
+
+                // re-enable read timer
+                this.Invoke(new EventHandler(delegate
+                {
+                    timer1.Enabled = true;
+                }));
+            }
+        }
+
+
+        /*
+        * 函数：isError
+        * 功能：判断是否发送错误
+        * 
+        * 
+        */
+        private bool isError()
+        {
+
+            try
+            {
+                str = serialPort1.ReadTo(":");
+            }
+            catch (TimeoutException)
+            {
+                f4 = new Form4("通讯异常，请检查设备！");
+                f4.Show();
+            }
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (Convert.ToInt32(str[i]) == 53)
+                {
+                    if (Convert.ToInt32(str[i + 1]) == 69)
+                    {
+                        switch (str[i + 2])
+                        {
+                            case 'A': f4 = new Form4("数据超出范围！"); f4.Show(); return true;
+                            case 'B': f4 = new Form4("不存在的命令！"); f4.Show(); return true;
+                            case 'C': f4 = new Form4("命令不完整！"); f4.Show(); return true;
+                            case 'D': f4 = new Form4("校验和错误！"); f4.Show(); return true;
+                            default: break;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
