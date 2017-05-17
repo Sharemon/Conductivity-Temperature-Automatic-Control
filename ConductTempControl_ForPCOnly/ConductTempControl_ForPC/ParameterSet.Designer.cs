@@ -268,6 +268,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.MaximizeBox = false;
             this.Name = "ParameterSet";
             this.Text = "参数设置";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ParameterSet_FormClosing);

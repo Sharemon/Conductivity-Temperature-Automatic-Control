@@ -91,6 +91,7 @@
             this.ClientSize = new System.Drawing.Size(431, 369);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.MaximizeBox = false;
             this.Name = "LogShow";
             this.Text = "操作日志";
             this.Load += new System.EventHandler(this.LogShow_Load);

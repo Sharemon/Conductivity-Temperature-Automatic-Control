@@ -35,7 +35,8 @@ namespace ConductTempControl_ForPC
             ReadTimeout = readTimeout
         };
 
-        private const int intervalOfWR = 200;
+        // Todo:Check the value, try to minimize it.
+        private const int intervalOfWR = 20;
         #endregion
 
         #region Command 

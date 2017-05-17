@@ -37,6 +37,7 @@
             this.MenuChart = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuOperation = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.LblTempShowAuto = new System.Windows.Forms.TextBox();
             this.PicFlucShow = new System.Windows.Forms.PictureBox();
             this.TxtInitTemp = new System.Windows.Forms.TextBox();
             this.TxtIntervalTemp = new System.Windows.Forms.TextBox();
@@ -47,7 +48,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.StaCom = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LblTempShowAuto = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PicFlucShow)).BeginInit();
@@ -101,21 +101,21 @@
             // MenuManual
             // 
             this.MenuManual.Name = "MenuManual";
-            this.MenuManual.Size = new System.Drawing.Size(124, 22);
+            this.MenuManual.Size = new System.Drawing.Size(152, 22);
             this.MenuManual.Text = "手动操作";
             this.MenuManual.Click += new System.EventHandler(this.MenuManual_Click);
             // 
             // MenuChart
             // 
             this.MenuChart.Name = "MenuChart";
-            this.MenuChart.Size = new System.Drawing.Size(124, 22);
+            this.MenuChart.Size = new System.Drawing.Size(152, 22);
             this.MenuChart.Text = "曲线图";
             this.MenuChart.Click += new System.EventHandler(this.MenuChart_Click);
             // 
             // MenuOperation
             // 
             this.MenuOperation.Name = "MenuOperation";
-            this.MenuOperation.Size = new System.Drawing.Size(124, 22);
+            this.MenuOperation.Size = new System.Drawing.Size(152, 22);
             this.MenuOperation.Text = "操作日志";
             this.MenuOperation.Click += new System.EventHandler(this.MenuOperation_Click);
             // 
@@ -129,6 +129,20 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "当前温度显示";
+            // 
+            // LblTempShowAuto
+            // 
+            this.LblTempShowAuto.BackColor = System.Drawing.SystemColors.Control;
+            this.LblTempShowAuto.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.LblTempShowAuto.Font = new System.Drawing.Font("Microsoft YaHei", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblTempShowAuto.ForeColor = System.Drawing.Color.Red;
+            this.LblTempShowAuto.Location = new System.Drawing.Point(78, 17);
+            this.LblTempShowAuto.Name = "LblTempShowAuto";
+            this.LblTempShowAuto.Size = new System.Drawing.Size(222, 64);
+            this.LblTempShowAuto.TabIndex = 6;
+            this.LblTempShowAuto.TabStop = false;
+            this.LblTempShowAuto.Text = "0.000 ℃";
+            this.LblTempShowAuto.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // PicFlucShow
             // 
@@ -219,20 +233,6 @@
             this.StaCom.Name = "StaCom";
             this.StaCom.Size = new System.Drawing.Size(0, 17);
             // 
-            // LblTempShowAuto
-            // 
-            this.LblTempShowAuto.BackColor = System.Drawing.SystemColors.Control;
-            this.LblTempShowAuto.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.LblTempShowAuto.Font = new System.Drawing.Font("Microsoft YaHei", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblTempShowAuto.ForeColor = System.Drawing.Color.Red;
-            this.LblTempShowAuto.Location = new System.Drawing.Point(78, 17);
-            this.LblTempShowAuto.Name = "LblTempShowAuto";
-            this.LblTempShowAuto.Size = new System.Drawing.Size(222, 64);
-            this.LblTempShowAuto.TabIndex = 6;
-            this.LblTempShowAuto.TabStop = false;
-            this.LblTempShowAuto.Text = "0.000 ℃";
-            this.LblTempShowAuto.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -249,6 +249,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "自动控温系统";
             this.Load += new System.EventHandler(this.MainForm_Load);

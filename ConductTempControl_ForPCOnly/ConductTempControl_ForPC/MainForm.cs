@@ -18,7 +18,7 @@ namespace ConductTempControl_ForPC
     {
         private StepControl autoStep;
         private bool runOrStop = true;      // Indicate the function of RUN button
-        System.Timers.Timer blinkTimer = new System.Timers.Timer();
+        private System.Timers.Timer blinkTimer = new System.Timers.Timer();
         private const string configFilePath = @"./config.ini";
         private const string configSec = "CONFIG";
 
@@ -306,7 +306,7 @@ namespace ConductTempControl_ForPC
         {
             // Comset form will be topmost, do not need to check
             Form fm = new ManualControl();
-            fm.Show();
+            fm.ShowDialog();
         }
 
         private void MenuChart_Click(object sender, EventArgs e)

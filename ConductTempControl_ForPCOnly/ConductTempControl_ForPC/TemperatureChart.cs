@@ -63,20 +63,36 @@ namespace ConductTempControl_ForPC
         /// <param name="e"></param>
         private void CtrlTimer_Tick(object sender, EventArgs e)
         {
-            this.Invoke(new EventHandler(delegate
+            if (GlbVars.tempReadTimer.Enabled)
             {
                 TimeSpan ts = DateTime.Now - GlbVars.ctrlStartTime;
-                LblCtrlTimeShow.Text = String.Format("{0}:{1}:{2}", ts.Hours, ts.Minutes, ts.Seconds);
+                this.LblCtrlTimeShow.Invoke(new EventHandler(delegate
+                {
+                    LblCtrlTimeShow.Text = String.Format("{0}:{1}:{2}", ts.Hours, ts.Minutes, ts.Seconds);
+                }));
+            }
+            else
+            {
+                this.LblCtrlTimeShow.Invoke(new EventHandler(delegate
+                {
+                    LblCtrlTimeShow.Text = "N/A";
+                }));
+            }
 
-                float fluc = 0;
-                if (GlbVars.GetFluc(GlbVars.tempFlucLen_10min, out fluc))
-                {
-                    LblFlucShow.Text = fluc.ToString("0.000");
-                }
-                else
-                {
-                    LblFlucShow.Text = "N/A";
-                }
+            float fluc = 0;
+            string flucString = "N/A";
+            if (GlbVars.GetFluc(GlbVars.tempFlucLen_10min, out fluc))
+            {
+                flucString = fluc.ToString("0.000");
+            }
+            else
+            {
+                flucString = "N/A";
+            }
+
+            this.LblFlucShow.Invoke(new EventHandler(delegate
+            {
+                LblFlucShow.Text = flucString;
             }));
         }
 
