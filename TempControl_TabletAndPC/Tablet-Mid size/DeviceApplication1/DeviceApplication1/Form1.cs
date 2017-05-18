@@ -41,7 +41,7 @@ namespace DeviceApplication1
         private string strTemp;
         private bool saveTempFlag = true;
         public int tempNum = 30*22+1;      //暂存的数据长度，为了画图
-        public int tempNum2 = 30*10;      //暂存的数据长度，为了求波动度
+        public int tempNum2 = 30*2;      //暂存的数据长度，为了求波动度
         private int dataNum = 0;
         private string fileName;
         private StreamWriter sw;
@@ -50,15 +50,13 @@ namespace DeviceApplication1
         private int timerCount = 1;
         private float Min;
         private float Max;
-        private float fluctuation;
+        private float fluctuation = float.NaN;
         public float TempSet;
         public float flucCrite = 0.5F;
         private Form f2;
         private Form f3;
         private Form f4;
         private bool linkState = false;
-
-        private bool tempbool = false;
 
         public MainForm()
         {
@@ -229,17 +227,17 @@ namespace DeviceApplication1
 
                 //求波动率
                 string stringFluc;
-                if (temperature2.Count > tempNum2-2) //60~1min
+                if (temperature2.Count > tempNum2-2) //30~1min
                 {
                     Max = temperature2[0];
                     Min = temperature2[0];
                     for (int i = 0; i < temperature2.Count; i++)
                     {
-                        if (temperature2[i] < Min)          //求15min的最小值
+                        if (temperature2[i] < Min)          //求2min的最小值
                         {
                             Min = temperature2[i];
                         }
-                        if (temperature2[i] > Max)          //求15min的最大值
+                        if (temperature2[i] > Max)          //求2min的最大值
                         {
                             Max = temperature2[i];
                         }
@@ -270,6 +268,7 @@ namespace DeviceApplication1
                 }
                 else
                 {
+                    fluctuation = float.NaN;
                     stringFluc = "N/A";
                     /*不再显示波动度信息
                     pictureBox2.BackColor = Color.Red;
@@ -491,7 +490,18 @@ namespace DeviceApplication1
 
             if (readData[readData.Length - 1] == '?')     // read parameter
             {
-                ;
+                // decode the parameter and return parameter
+                switch (readData.Substring(0, 5))
+                {
+                    case "FLUCT":       // temperature fluctuation
+                        if (float.IsNaN(fluctuation))
+                            serialPort2.Write("FLUCT NAN!@");
+                        else
+                            serialPort2.Write("FLUC " + fluctuation.ToString("0.000") + "!@");
+                        break;
+                    default:
+                        break;
+                }
             }
             else if (readData[readData.Length - 1] == '!') // set parameters
             {
@@ -505,19 +515,29 @@ namespace DeviceApplication1
                 switch (readData.Substring(0, 5))
                 {
                     case "TMSET":       // temperature setting
+                        // set temperature target
                         string numString = readData.Substring(6, readData.Length - 7);
                         float value = float.Parse(numString);
                         serialPort1.WriteLine("@35WA" + value.ToString("0.000") + ":\r");
-                        if (!isError())
+                        
+                        // update the UI and variables
+                        this.Invoke(new EventHandler(delegate
                         {
-                            paraments[0] = value;
-                            TempSet = value;
-                            TempSet2.Text = value.ToString("0.000");
-                        }
-                        else
-                        {
-                            TempSet2.Text = paraments[0].ToString("0.000");
-                        }
+                            if (!isError())
+                            {
+                                paraments[0] = value;
+                                TempSet = value;
+                                TempSet2.Text = value.ToString("0.000");
+                            }
+                            else
+                            {
+                                TempSet2.Text = paraments[0].ToString("0.000");
+                            }
+                        }));
+
+                        // clear fluctuation list
+                        temperature2.Clear();
+
                         break;
                     default:
                         break;
